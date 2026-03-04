@@ -1,6 +1,7 @@
 package com.example.wizzar.data.dataSource.remote.dto
 
-data class CurrentWeatherDto(
+data class CurrentWeatherResponseDto(
+    val name: String,
 
     val dt: Long,
 
@@ -8,7 +9,7 @@ data class CurrentWeatherDto(
 
     val main: MainDto,
 
-    val windSpeed: Double,
+    val wind : WindDto,
 
     val sys: SysDto
 
@@ -16,5 +17,8 @@ data class CurrentWeatherDto(
     data class SysDto(
         val sunrise: Long,
         val sunset: Long
+    )
+    data class WindDto(
+        val speed: Double
     )
 }

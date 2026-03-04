@@ -1,6 +1,6 @@
 package com.example.wizzar.domain.model
 
-data class DailyWeather(
+data class DailyForecast(
     val date: Long,
 
     val minTemp: Double,

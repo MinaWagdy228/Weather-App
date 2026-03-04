@@ -3,7 +3,7 @@ package com.example.wizzar.data.dataSource.remote.dto
 data class ForecastResponseDto(
 
     val list: List<ForecastItemDto>,
-    val city: String
+    val city: CityDto
 
 )
 
@@ -15,4 +15,8 @@ data class ForecastItemDto(
 
     val weather: List<WeatherDto>
 
+)
+
+data class CityDto(
+    val name: String
 )

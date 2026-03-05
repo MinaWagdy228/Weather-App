@@ -7,7 +7,5 @@ data class DailyForecast(
 
     val maxTemp: Double,
 
-    val humidity: Int,
-
     val weatherConditionId: Int
 )

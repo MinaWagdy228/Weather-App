@@ -16,7 +16,7 @@ data class ForecastEntity(
 
     val humidity: Int,
 
-    val icon: String,
+    val icon: String, // not needed, as we can get the icon from the weather condition id, but it is easier to store it here
 
     val weatherId: Int
 )

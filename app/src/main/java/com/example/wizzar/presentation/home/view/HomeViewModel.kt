@@ -2,7 +2,7 @@ package com.example.wizzar.presentation.home.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wizzar.domain.usercase.WeatherUseCase
+import com.example.wizzar.domain.usecase.WeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

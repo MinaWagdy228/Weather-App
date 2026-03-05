@@ -4,6 +4,7 @@ import com.example.wizzar.data.dataSource.local.entity.CurrentWeatherEntity
 import com.example.wizzar.data.dataSource.local.entity.ForecastEntity
 import com.example.wizzar.data.dataSource.remote.dto.CurrentWeatherResponseDto
 import com.example.wizzar.data.dataSource.remote.dto.ForecastResponseDto
+import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.HourlyForecast
 
 fun CurrentWeatherResponseDto.toEntity(): CurrentWeatherEntity {
@@ -23,13 +24,36 @@ fun CurrentWeatherResponseDto.toEntity(): CurrentWeatherEntity {
         wind = wind.speed,
 
         description = weather.first().description,
-        icon = weather.first().icon,
+        weatherConditionId = weather.first().id,
 
         sunrise = sys.sunrise,
         sunset = sys.sunset
     )
 }
 
+fun CurrentWeatherEntity.toDomain(): CurrentWeather? {
+
+    return CurrentWeather(
+        city = cityName,
+
+        temperature = temperature,
+        feelsLike = feelsLike,
+
+        minTemp = minTemp,
+        maxTemp = maxTemp,
+
+        humidity = humidity,
+        pressure = pressure,
+
+        wind = wind,
+
+        description = description,
+        weatherConditionId = weatherConditionId,
+
+        sunrise = sunrise,
+        sunset = sunset
+    )
+}
 fun ForecastResponseDto.toEntity(): List<ForecastEntity> {
 
     val cityName = city

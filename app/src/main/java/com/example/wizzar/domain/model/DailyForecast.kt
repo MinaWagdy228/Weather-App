@@ -7,5 +7,6 @@ data class DailyForecast(
 
     val maxTemp: Double,
 
-    val weatherConditionId: Int
+    val weatherConditionId: Int,
+    val icon: String
 )

@@ -1,22 +1,25 @@
 package com.example.wizzar.data.dataSource.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class ForecastResponseDto(
-
-    val list: List<ForecastItemDto>,
-    val city: CityDto
-
+    @SerializedName("list") val list: List<ForecastItemDto>,
+    @SerializedName("city") val city: CityDto
 )
 
 data class ForecastItemDto(
+    @SerializedName("dt") val dt: Long,
+    @SerializedName("main") val main: MainDto,
+    @SerializedName("weather") val weather: List<WeatherDto>,
+    @SerializedName("wind") val wind: WindDto // Added to extract wind speed
+)
 
-    val dt: Long,
-
-    val main: MainDto,
-
-    val weather: List<WeatherDto>
-
+data class WindDto(
+    @SerializedName("speed") val speed: Double
 )
 
 data class CityDto(
-    val name: String
+    @SerializedName("name") val name: String,
+    @SerializedName("sunrise") val sunrise: Long, // Added for UI
+    @SerializedName("sunset") val sunset: Long    // Added for UI
 )

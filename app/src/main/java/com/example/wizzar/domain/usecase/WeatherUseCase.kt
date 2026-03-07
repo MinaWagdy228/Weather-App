@@ -1,60 +1,59 @@
 package com.example.wizzar.domain.usecase
 
-import com.example.wizzar.domain.model.HourlyForecast
 import com.example.wizzar.domain.model.DailyForecast
-import com.example.wizzar.domain.model.Location
-import com.example.wizzar.domain.model.WeatherOverview
+import com.example.wizzar.domain.model.HourlyForecast
+import com.example.wizzar.domain.model.WeatherData
 import com.example.wizzar.domain.repository.WeatherRepository
+import com.example.wizzar.domain.model.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class WeatherUseCase @Inject constructor(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val refreshWeatherUseCase: RefreshWeatherUseCase
 ) {
 
-    fun observeWeather(): Flow<WeatherOverview> {
-
+    fun observeWeather(): Flow<WeatherData?> {
         return combine(
             repository.observeCurrentWeather(),
             repository.observeForecast()
         ) { current, forecast ->
 
-            val hourly = forecast.map {
+            if (current == null || forecast.isEmpty()) {
+                return@combine null
+            }
 
+            val hourly = forecast.map {
                 HourlyForecast(
                     time = it.time,
                     temperature = it.temperature,
-                    weatherConditionId = it.weatherConditionId
+                    weatherConditionId = it.weatherConditionId,
+                    icon = it.icon
                 )
-
             }
 
             val daily = forecast
                 .groupBy { it.time / 86400 }
                 .map { (_, day) ->
-
                     DailyForecast(
                         date = day.first().time,
                         minTemp = day.minOf { it.temperature },
                         maxTemp = day.maxOf { it.temperature },
-                        weatherConditionId = day.first().weatherConditionId
+                        weatherConditionId = day.first().weatherConditionId,
+                        icon = day.first().icon
                     )
-
                 }
 
-            WeatherOverview(
+            WeatherData(
                 currentWeather = current,
-                hourlyWeather = hourly,
-                dailyWeather = daily
+                hourlyForecast = hourly,
+                dailyForecast = daily
             )
-
         }
-
     }
 
-    suspend fun refreshWeather(location: Location) {
-        repository.refreshWeather(location)
+    suspend fun refreshWeather(forceRefresh: Boolean = false): Result<WeatherData> {
+        return refreshWeatherUseCase.execute(forceRefresh) // Pass it down
     }
-
 }

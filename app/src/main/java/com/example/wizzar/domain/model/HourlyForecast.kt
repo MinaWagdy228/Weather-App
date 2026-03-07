@@ -6,6 +6,6 @@ data class HourlyForecast(
 
     val temperature: Double,
 
-    val weatherConditionId: Int
-
+    val weatherConditionId: Int,
+    val icon: String
 )

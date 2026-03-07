@@ -102,5 +102,8 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.57.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 }

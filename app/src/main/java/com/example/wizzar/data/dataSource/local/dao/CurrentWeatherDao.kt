@@ -10,16 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CurrentWeatherDao {
 
-
-    @Query("SELECT * FROM current_weather_table LIMIT 1") // LIMIT 1 is
+    @Query("SELECT * FROM current_weather_table LIMIT 1")
     fun observeCurrentWeather(): Flow<CurrentWeatherEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCurrentWeather(currentWeatherEntity: CurrentWeatherEntity)
 
-     @Query("""
-        DELETE FROM current_weather_table
-        WHERE cityName = :cityName
-    """)
-    suspend fun deleteCurrentWeather(cityName: String)
+    @Query("DELETE FROM current_weather_table")
+    suspend fun deleteAllCurrentWeather()
 }

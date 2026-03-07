@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.wizzar.domain.usecase.WeatherUseCase
 import com.example.wizzar.domain.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -21,9 +23,10 @@ class HomeViewModel @Inject constructor(
     private val weatherUseCase: WeatherUseCase
 ) : ViewModel() {
 
-    // 1. Add a state to track the background refresh status
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    private val _uiEvent = MutableSharedFlow<String>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     init {
         fetchWeatherForCurrentLocation()
@@ -31,19 +34,19 @@ class HomeViewModel @Inject constructor(
 
     fun fetchWeatherForCurrentLocation(forceRefresh: Boolean = false) {
         viewModelScope.launch {
-            // 2. Turn on the refreshing spinner
             _isRefreshing.value = true
 
             when (val result = weatherUseCase.refreshWeather(forceRefresh)) {
                 is Result.Error -> {
                     Log.e("HomeViewModel", "Refresh failed: ${result.error.message}")
+                    // 2. Emit the error message so the UI can show it in a Toast!
+                    _uiEvent.emit(result.error.message)
                 }
                 is Result.Success -> {
                     Log.d("HomeViewModel", "Weather refreshed successfully")
                 }
             }
 
-            // 3. Turn off the refreshing spinner
             _isRefreshing.value = false
         }
     }

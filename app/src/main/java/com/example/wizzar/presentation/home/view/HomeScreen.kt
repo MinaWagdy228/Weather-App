@@ -37,7 +37,8 @@ import com.example.wizzar.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
-
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 // --- 1. STATEFUL COMPOSABLE ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +48,16 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
+    // 1. Get the local context for the Toast
+    val context = LocalContext.current
+
+    // 2. Listen for UI events (like Toasts) from the ViewModel
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -55,6 +66,9 @@ fun HomeScreen(
 
         if (isGranted) {
             viewModel.fetchWeatherForCurrentLocation(forceRefresh = true)
+        } else {
+            // Optional: You can also show a toast here if they deny permission!
+            Toast.makeText(context, "Location permission is needed for local weather.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -104,7 +118,6 @@ fun HomeScreen(
     }
 }
 
-// ... Keep your HomeScreenContent and UI Components down below exactly as they were!
 // --- 2. STATELESS COMPOSABLE (Pure UI) ---
 @Composable
 fun HomeScreenContent(

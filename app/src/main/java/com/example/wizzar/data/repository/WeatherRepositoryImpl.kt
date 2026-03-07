@@ -30,7 +30,6 @@ class WeatherRepositoryImpl @Inject constructor(
         return currentWeatherDao
             .observeCurrentWeather()
             .map { entity ->
-                // Use the safe call operator '?.'. If the DB is empty, this passes 'null' to the Domain layer.
                 entity?.toDomain()
             }
     }
@@ -59,7 +58,7 @@ class WeatherRepositoryImpl @Inject constructor(
             val entity = currentWeatherDao.observeCurrentWeather().first()
             if (entity == null) return null
 
-            val currentWeather = entity.toDomain()
+            val currentWeather = entity.toDomain() ?: return null
 
             val forecastEntities = forecastDao.observeForecast().first()
             val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }
@@ -102,7 +101,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
         // 2. Map the very first item to CurrentWeather
         val currentWeather = forecastResponse.toCurrentWeatherEntity().toDomain()
-
+            ?: throw Exception("Failed to map fresh network data")
         // 3. Map the rest of the list for hourly/daily
         val forecastEntities = forecastResponse.toEntity()
         val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }

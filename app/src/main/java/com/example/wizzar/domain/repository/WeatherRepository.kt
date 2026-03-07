@@ -10,7 +10,7 @@ interface WeatherRepository {
 
     fun observeCurrentWeather(): Flow<CurrentWeather?>
 
-    fun observeForecast(): Flow<List<HourlyForecast>> // No cityName - single location design
+    fun observeForecast(): Flow<List<HourlyForecast>>
 
     suspend fun refreshWeather(location: Location)
 

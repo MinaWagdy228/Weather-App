@@ -27,25 +27,22 @@ fun ForecastResponseDto.toCurrentWeatherEntity(): CurrentWeatherEntity {
     )
 }
 
-fun CurrentWeatherEntity.toDomain(): CurrentWeather {
+fun CurrentWeatherEntity?.toDomain(): CurrentWeather? {
+
+    // 2. We safely catch the null from the empty Room database here
+    if (this == null) return null
 
     return CurrentWeather(
         city = cityName,
-
         temperature = temperature,
         feelsLike = feelsLike,
-
         minTemp = minTemp,
         maxTemp = maxTemp,
-
         humidity = humidity,
         pressure = pressure,
-
         wind = wind,
-
         description = description,
         weatherConditionId = weatherConditionId,
-
         sunrise = sunrise,
         sunset = sunset,
         icon = icon
@@ -72,30 +69,21 @@ fun CurrentWeather.toEntity(): CurrentWeatherEntity {
 }
 
 fun ForecastResponseDto.toEntity(): List<ForecastEntity> {
-
     val cityName = city
 
     return list.map {
-
         ForecastEntity(
             cityName = cityName.name,
-
             timestamp = it.dt,
-
             temperature = it.main.temp,
-
             humidity = it.main.humidity,
-
             icon = it.weather.first().icon,
-
             weatherId = it.weather.first().id
         )
-
     }
 }
 
 fun ForecastEntity.toHourlyForecast(): HourlyForecast {
-
     return HourlyForecast(
         time = timestamp,
         temperature = temperature,
@@ -115,4 +103,3 @@ fun HourlyForecast.toEntity(cityName: String): ForecastEntity {
         weatherId = weatherConditionId
     )
 }
-

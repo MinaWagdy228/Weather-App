@@ -13,7 +13,7 @@ data class WeatherData(
     }
 
     fun isComplete(): Boolean {
-        return currentWeather.city.isNotBlank() &&
+        return currentWeather?.city?.isNotBlank() == true &&
                currentWeather.temperature > 0 &&
                hourlyForecast.isNotEmpty() &&
                dailyForecast.isNotEmpty()

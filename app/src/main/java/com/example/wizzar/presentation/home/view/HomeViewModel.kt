@@ -53,7 +53,7 @@ class HomeViewModel @Inject constructor(
 
     val uiState: StateFlow<HomeUiState> = weatherUseCase.observeWeather()
         .map { weatherData ->
-            if (weatherData != null && weatherData.currentWeather != null) {
+            if (weatherData != null) {
                 HomeUiState.Success(
                     currentWeather = weatherData.currentWeather,
                     hourlyForecast = weatherData.hourlyForecast,

@@ -128,10 +128,11 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override suspend fun saveToCache(weatherData: WeatherData) {
         try {
-            // Save current weather to database
+            currentWeatherDao.deleteAllCurrentWeather()
+            forecastDao.deleteAllForecast()
+
             currentWeatherDao.insertCurrentWeather(weatherData.currentWeather.toEntity())
 
-            // Save forecast to database
             val forecastEntities = weatherData.hourlyForecast.map {
                 it.toEntity(weatherData.currentWeather.city)
             }

@@ -1,5 +1,7 @@
 package com.example.wizzar.presentation.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -7,15 +9,22 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.wizzar.presentation.main.MainViewModel
 import com.example.wizzar.ui.theme.PrimaryBlue
-import com.example.wizzar.ui.theme.SurfaceDark
+import com.example.wizzar.ui.theme.SkyBase
+import com.example.wizzar.ui.theme.SkyBlueBase
 import com.example.wizzar.ui.theme.TextGray
 import com.example.wizzar.ui.theme.TextWhite
 
 @Composable
-fun WizzarNavigationBar(navController: NavController) {
+fun WizzarNavigationBar(navController: NavController, mainViewModel: MainViewModel) {
     val items = listOf(
         ScreenRoutes.Home,
         ScreenRoutes.Favorites,
@@ -23,9 +32,21 @@ fun WizzarNavigationBar(navController: NavController) {
         ScreenRoutes.Settings
     )
 
+    // 1. Observe the lightweight boolean directly
+    val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
+
+    // 2. Select colors dynamically
+    val barColor = if (isDaytime) SkyBlueBase else SkyBase
+    val unselectedContentColor = if (isDaytime) Color.Gray else TextGray
+    val contentColor = if (isDaytime) Color.Black else TextWhite
+
     NavigationBar(
-        containerColor = SurfaceDark,
-        contentColor = TextWhite
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
+            .clip(RoundedCornerShape(32.dp)),
+        containerColor = barColor,
+        contentColor = contentColor,
+        tonalElevation = 8.dp // Adds a subtle drop shadow to make it "float"
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -37,7 +58,6 @@ fun WizzarNavigationBar(navController: NavController) {
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
-                        // Pop up to the start destination of the graph to avoid building up a large stack
                         navController.graph.startDestinationRoute?.let { route ->
                             popUpTo(route) { saveState = true }
                         }
@@ -48,9 +68,9 @@ fun WizzarNavigationBar(navController: NavController) {
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = PrimaryBlue,
                     selectedTextColor = PrimaryBlue,
-                    unselectedIconColor = TextGray,
-                    unselectedTextColor = TextGray,
-                    indicatorColor = SurfaceDark // Keeps the background unified when selected
+                    unselectedIconColor = unselectedContentColor,
+                    unselectedTextColor = unselectedContentColor,
+                    indicatorColor = barColor
                 )
             )
         }

@@ -1,8 +1,11 @@
 package com.example.wizzar.data.dataSource.local
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.example.wizzar.domain.model.Location
 import com.example.wizzar.domain.location.LocationProvider
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -22,25 +25,43 @@ class LocationProviderImpl @Inject constructor(private val context: Context) : L
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): Location {
         return suspendCancellableCoroutine { continuation ->
-            try {
-                // Actively fetches a fresh location with high accuracy
-                fusedLocationClient.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    CancellationTokenSource().token
-                ).addOnSuccessListener { androidLocation ->
-                    if (androidLocation != null) {
-                        Log.d("LocationProvider", "Fresh Location: ${androidLocation.latitude}, ${androidLocation.longitude}")
-                        continuation.resume(Location(androidLocation.latitude, androidLocation.longitude))
-                    } else {
-                        Log.w("LocationProvider", "Location null, falling back to Cairo")
-                        continuation.resume(Location(30.0444, 31.2357))
-                    }
-                }.addOnFailureListener { exception ->
-                    Log.e("LocationProvider", "Failed to get location", exception)
+
+            // 1. Check if we actually have permission FIRST
+            val hasFineLocation = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+            val hasCoarseLocation = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasFineLocation && !hasCoarseLocation) {
+                Log.w(
+                    "LocationProvider",
+                    "No permissions granted yet, falling back to default location."
+                )
+                continuation.resume(Location(30.0444, 31.2357))
+                return@suspendCancellableCoroutine
+            }
+
+            // 2. If we DO have permission, now it's safe to ask the FusedLocationClient
+            fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                CancellationTokenSource().token
+            ).addOnSuccessListener { androidLocation ->
+                if (androidLocation != null) {
+                    continuation.resume(
+                        Location(
+                            androidLocation.latitude,
+                            androidLocation.longitude
+                        )
+                    )
+                } else {
                     continuation.resume(Location(30.0444, 31.2357))
                 }
-            } catch (e: SecurityException) {
-                Log.e("LocationProvider", "Permission missing", e)
+            }.addOnFailureListener { exception ->
+                Log.e("LocationProvider", "Failed to get location", exception)
                 continuation.resume(Location(30.0444, 31.2357))
             }
         }

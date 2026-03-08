@@ -96,14 +96,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0") // for locale switching
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0") // FlowRow in AlertsScreen
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-location:21.1.0") // For location services
 
     implementation("com.google.dagger:hilt-android:2.57.1")
     ksp("com.google.dagger:hilt-android-compiler:2.57.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.compose.material:material-icons-extended")
-
-    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 }

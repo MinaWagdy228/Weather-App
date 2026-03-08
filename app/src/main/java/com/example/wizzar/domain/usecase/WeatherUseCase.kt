@@ -54,6 +54,6 @@ class WeatherUseCase @Inject constructor(
     }
 
     suspend fun refreshWeather(forceRefresh: Boolean = false): Result<WeatherData> {
-        return refreshWeatherUseCase.execute(forceRefresh) // Pass it down
+        return refreshWeatherUseCase.execute(forceRefresh)
     }
 }

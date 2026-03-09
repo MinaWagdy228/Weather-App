@@ -11,7 +11,7 @@ data class ForecastItemDto(
     @SerializedName("dt") val dt: Long,
     @SerializedName("main") val main: MainDto,
     @SerializedName("weather") val weather: List<WeatherDto>,
-    @SerializedName("wind") val wind: WindDto // Added to extract wind speed
+    @SerializedName("wind") val wind: WindDto
 )
 
 data class WindDto(
@@ -20,6 +20,12 @@ data class WindDto(
 
 data class CityDto(
     @SerializedName("name") val name: String,
-    @SerializedName("sunrise") val sunrise: Long, // Added for UI
-    @SerializedName("sunset") val sunset: Long    // Added for UI
+    @SerializedName("sunrise") val sunrise: Long,
+    @SerializedName("sunset") val sunset: Long,
+    @SerializedName("coord") val coord: CoordDto
+)
+
+data class CoordDto(
+    @SerializedName("lon") val lon: Double,
+    @SerializedName("lat") val lat: Double
 )

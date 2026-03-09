@@ -3,9 +3,10 @@ package com.example.wizzar.data.dataSource.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "current_weather_table")
+@Entity(tableName = "current_weather_table", primaryKeys = ["longitude", "latitude"])
 data class CurrentWeatherEntity(
-    @PrimaryKey(autoGenerate = false) val id: Int = 0, // Forces single row
+    val longitude: Double,
+    val latitude: Double,
     val cityName: String,
     val temperature: Double,
     val feelsLike: Double,
@@ -18,5 +19,5 @@ data class CurrentWeatherEntity(
     val weatherConditionId: Int,
     val sunrise: Long,
     val sunset: Long,
-    val icon: String // Added for UI
+    val icon: String
 )

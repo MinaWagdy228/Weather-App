@@ -13,5 +13,7 @@ data class CurrentWeather(
     val description: String,
     val sunrise: Long,
     val sunset: Long,
-    val icon: String // Added for UI
+    val icon: String,
+    val longitude: Double,
+    val latitude: Double
 )

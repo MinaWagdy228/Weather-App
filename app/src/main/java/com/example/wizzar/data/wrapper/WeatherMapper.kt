@@ -6,11 +6,10 @@ import com.example.wizzar.data.dataSource.remote.dto.ForecastResponseDto
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.HourlyForecast
 
-fun ForecastResponseDto.toCurrentWeatherEntity(): CurrentWeatherEntity {
+fun ForecastResponseDto.toCurrentWeatherEntity(requestedLatitude : Double, requestedLongitude : Double): CurrentWeatherEntity {
     val current = list.first()
 
     return CurrentWeatherEntity(
-        id = 0,
         cityName = city.name,
         temperature = current.main.temp,
         feelsLike = current.main.feelsLike,
@@ -23,7 +22,9 @@ fun ForecastResponseDto.toCurrentWeatherEntity(): CurrentWeatherEntity {
         weatherConditionId = current.weather.first().id,
         sunrise = city.sunrise,
         sunset = city.sunset,
-        icon = current.weather.first().icon
+        icon = current.weather.first().icon,
+        longitude = requestedLongitude,
+        latitude = requestedLatitude
     )
 }
 
@@ -45,7 +46,9 @@ fun CurrentWeatherEntity?.toDomain(): CurrentWeather? {
         weatherConditionId = weatherConditionId,
         sunrise = sunrise,
         sunset = sunset,
-        icon = icon
+        icon = icon,
+        longitude = longitude,
+        latitude = latitude
     )
 }
 
@@ -64,11 +67,13 @@ fun CurrentWeather.toEntity(): CurrentWeatherEntity {
         weatherConditionId = weatherConditionId,
         sunrise = sunrise,
         sunset = sunset,
-        icon = icon
+        icon = icon,
+        longitude = longitude,
+        latitude = latitude
     )
 }
 
-fun ForecastResponseDto.toEntity(): List<ForecastEntity> {
+fun ForecastResponseDto.toEntity(requestedLatitude : Double, requestedLongitude : Double): List<ForecastEntity> {
     val cityName = city
 
     return list.map {
@@ -78,7 +83,9 @@ fun ForecastResponseDto.toEntity(): List<ForecastEntity> {
             temperature = it.main.temp,
             humidity = it.main.humidity,
             icon = it.weather.first().icon,
-            weatherId = it.weather.first().id
+            weatherId = it.weather.first().id,
+            longitude = requestedLongitude,
+            latitude = requestedLatitude
         )
     }
 }
@@ -88,18 +95,22 @@ fun ForecastEntity.toHourlyForecast(): HourlyForecast {
         time = timestamp,
         temperature = temperature,
         weatherConditionId = weatherId,
-        icon = icon
+        icon = icon,
+        longitude = longitude,
+        latitude = latitude
     )
 }
 
 // Reverse mapper: HourlyForecast to Entity
-fun HourlyForecast.toEntity(cityName: String): ForecastEntity {
+fun HourlyForecast.toEntity(cityName: String, latitude : Double, longitude: Double): ForecastEntity {
     return ForecastEntity(
         cityName = cityName,
         timestamp = time,
         temperature = temperature,
-        humidity = 0, // Not available in HourlyForecast, use default
-        icon = "", // Not available in HourlyForecast, use default
-        weatherId = weatherConditionId
+        humidity = 0,
+        icon = "",
+        weatherId = weatherConditionId,
+        longitude = longitude,
+        latitude = latitude
     )
 }

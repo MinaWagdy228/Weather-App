@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.wizzar.presentation.main.MainViewModel
 import com.example.wizzar.ui.theme.PrimaryBlue
 import com.example.wizzar.ui.theme.SkyBase
 import com.example.wizzar.ui.theme.SkyBlueBase

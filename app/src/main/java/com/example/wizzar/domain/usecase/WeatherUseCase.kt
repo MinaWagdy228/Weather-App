@@ -14,10 +14,10 @@ class WeatherUseCase @Inject constructor(
     private val refreshWeatherUseCase: RefreshWeatherUseCase
 ) {
 
-    fun observeWeather(): Flow<WeatherData?> {
+    fun observeWeather(lat : Double, lon : Double): Flow<WeatherData?> {
         return combine(
-            repository.observeCurrentWeather(),
-            repository.observeForecast()
+            repository.observeCurrentWeather(lat, lon),
+            repository.observeForecast(lat, lon)
         ) { current, forecast ->
 
             if (current == null || forecast.isEmpty()) {
@@ -29,7 +29,9 @@ class WeatherUseCase @Inject constructor(
                     time = it.time,
                     temperature = it.temperature,
                     weatherConditionId = it.weatherConditionId,
-                    icon = it.icon
+                    icon = it.icon,
+                    longitude = it.longitude,
+                    latitude = it.latitude
                 )
             }
 
@@ -53,7 +55,7 @@ class WeatherUseCase @Inject constructor(
         }
     }
 
-    suspend fun refreshWeather(forceRefresh: Boolean = false): Result<WeatherData> {
-        return refreshWeatherUseCase.execute(forceRefresh)
+    suspend fun refreshWeather(latitude : Double, longitude : Double, forceRefresh: Boolean = false): Result<WeatherData> {
+        return refreshWeatherUseCase.execute(latitude, longitude, forceRefresh)
     }
 }

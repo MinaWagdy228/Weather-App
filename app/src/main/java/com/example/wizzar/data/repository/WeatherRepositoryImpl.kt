@@ -12,7 +12,6 @@ import com.example.wizzar.data.wrapper.toHourlyForecast
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
-import com.example.wizzar.domain.model.Location
 import com.example.wizzar.domain.model.WeatherData
 import com.example.wizzar.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
@@ -26,90 +25,23 @@ class WeatherRepositoryImpl @Inject constructor(
     private val forecastDao: ForecastDao
 ) : WeatherRepository {
 
-    override fun observeCurrentWeather(): Flow<CurrentWeather?> {
-        return currentWeatherDao
-            .observeCurrentWeather()
-            .map { entity ->
-                entity?.toDomain()
-            }
+    override fun observeCurrentWeather(lat: Double, lon: Double): Flow<CurrentWeather?> {
+        return currentWeatherDao.observeCurrentWeather(lat, lon).map { it?.toDomain() }
     }
 
-    override fun observeForecast(): Flow<List<HourlyForecast>> {
-        return forecastDao.observeForecast().map { list ->
-            list.map { entity ->
-                entity.toHourlyForecast()
-            }
-        }
+    override fun observeForecast(lat: Double, lon: Double): Flow<List<HourlyForecast>> {
+        return forecastDao.observeForecast(lat, lon).map { list -> list.map { it.toHourlyForecast() } }
     }
 
-    override suspend fun refreshWeather(location: Location) {
-        val weatherData = fetchWeatherFromApi(location)
-
-        // Delete old data before saving new (single location design)
-        currentWeatherDao.deleteAllCurrentWeather()
-        forecastDao.deleteAllForecast()
-
-        saveToCache(weatherData)
-    }
-
-    override suspend fun getCachedWeather(): WeatherData? {
+    override suspend fun getCachedWeather(lat: Double, lon: Double): WeatherData? {
         return try {
-            // Null safety check: If the current weather table is empty, we don't have a valid cache
-            val entity = currentWeatherDao.observeCurrentWeather().first()
-            if (entity == null) return null
-
+            val entity = currentWeatherDao.observeCurrentWeather(lat, lon).first() ?: return null
             val currentWeather = entity.toDomain() ?: return null
 
-            val forecastEntities = forecastDao.observeForecast().first()
+            val forecastEntities = forecastDao.observeForecast(lat, lon).first()
             val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }
 
-            // Group forecast by day to create daily forecast
-            val dailyForecast = forecastEntities
-                .groupBy {
-                    // Get the day number from timestamp (epoch seconds / 86400)
-                    it.timestamp / 86400
-                }
-                .map { (_, dayForecasts) ->
-                    DailyForecast(
-                        date = dayForecasts.first().timestamp,
-                        minTemp = dayForecasts.minOf { it.temperature },
-                        maxTemp = dayForecasts.maxOf { it.temperature },
-                        weatherConditionId = dayForecasts.first().weatherId,
-                        icon = dayForecasts.first().icon
-                    )
-                }
-
-            WeatherData(
-                currentWeather = currentWeather,
-                hourlyForecast = hourlyForecast,
-                dailyForecast = dailyForecast
-            )
-
-        } catch (e: Exception) {
-            Log.e("WeatherRepository", "Error getting cached weather", e)
-            null
-        }
-    }
-
-    override suspend fun fetchWeatherFromApi(location: Location): WeatherData {
-        // 1. Single API call using the forecast endpoint
-        val forecastResponse = weatherService.getForecast(
-            lat = location.latitude,
-            lon = location.longitude,
-            apiKey = API_KEY
-        )
-
-        // 2. Map the very first item to CurrentWeather
-        val currentWeather = forecastResponse.toCurrentWeatherEntity().toDomain()
-            ?: throw Exception("Failed to map fresh network data")
-        // 3. Map the rest of the list for hourly/daily
-        val forecastEntities = forecastResponse.toEntity()
-        val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }
-
-        // 4. Group by day for the 5-day forecast
-        val dailyForecast = forecastEntities
-            .groupBy { it.timestamp / 86400 } // Group by Day (Epoch / 86400 seconds)
-            .map { (_, dayForecasts) ->
+            val dailyForecast = forecastEntities.groupBy { it.timestamp / 86400 }.map { (_, dayForecasts) ->
                 DailyForecast(
                     date = dayForecasts.first().timestamp,
                     minTemp = dayForecasts.minOf { it.temperature },
@@ -118,23 +50,48 @@ class WeatherRepositoryImpl @Inject constructor(
                     icon = dayForecasts.first().icon
                 )
             }
+            WeatherData(currentWeather, hourlyForecast, dailyForecast)
+        } catch (e: Exception) {
+            Log.e("WeatherRepository", "Error getting cached weather", e)
+            null
+        }
+    }
 
-        return WeatherData(
-            currentWeather = currentWeather,
-            hourlyForecast = hourlyForecast,
-            dailyForecast = dailyForecast
-        )
+    override suspend fun fetchWeatherFromApi(lat: Double, lon: Double): WeatherData {
+        val forecastResponse = weatherService.getForecast(lat = lat, lon = lon, apiKey = API_KEY)
+
+        // Maps using exact GPS coordinates to override API shifts
+        val currentWeather = forecastResponse.toCurrentWeatherEntity(lat, lon).toDomain()
+            ?: throw Exception("Failed to map fresh network data")
+
+        val forecastEntities = forecastResponse.toEntity(lat, lon)
+        val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }
+
+        val dailyForecast = forecastEntities.groupBy { it.timestamp / 86400 }.map { (_, dayForecasts) ->
+            DailyForecast(
+                date = dayForecasts.first().timestamp,
+                minTemp = dayForecasts.minOf { it.temperature },
+                maxTemp = dayForecasts.maxOf { it.temperature },
+                weatherConditionId = dayForecasts.first().weatherId,
+                icon = dayForecasts.first().icon
+            )
+        }
+
+        return WeatherData(currentWeather, hourlyForecast, dailyForecast)
     }
 
     override suspend fun saveToCache(weatherData: WeatherData) {
         try {
-            currentWeatherDao.deleteAllCurrentWeather()
-            forecastDao.deleteAllForecast()
+            val lat = weatherData.currentWeather.latitude
+            val lon = weatherData.currentWeather.longitude
+
+            currentWeatherDao.deleteCurrentWeather(lat, lon)
+            forecastDao.deleteForecast(lat, lon)
 
             currentWeatherDao.insertCurrentWeather(weatherData.currentWeather.toEntity())
 
             val forecastEntities = weatherData.hourlyForecast.map {
-                it.toEntity(weatherData.currentWeather.city)
+                it.toEntity(weatherData.currentWeather.city, lat, lon)
             }
             forecastDao.insertForecast(forecastEntities)
 

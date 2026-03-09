@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.wizzar.presentation.common.StarryBackground
 import com.example.wizzar.presentation.common.SunnyBackground
-import com.example.wizzar.presentation.main.MainViewModel
+import com.example.wizzar.presentation.navigation.MainViewModel
 import com.example.wizzar.presentation.navigation.NavGraph
 import com.example.wizzar.presentation.navigation.WizzarNavigationBar
 import com.example.wizzar.ui.theme.WizzarTheme

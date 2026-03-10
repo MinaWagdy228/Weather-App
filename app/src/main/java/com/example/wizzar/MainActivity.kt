@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
 
                 Box(modifier = Modifier.fillMaxSize()) {
-                    if (!isDaytime) {
+                    if (isDaytime) {
                         SunnyBackground()
                     } else {
                         StarryBackground()

@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
+import kotlin.math.round
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -92,12 +93,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun Double.roundUpToFourDecimals(): BigDecimal {
-        // Convert the Double to a BigDecimal
-        val bigDecimal =
-            BigDecimal(this.toString()) // Use toString() for safer conversion from Double
-
-        // Set the scale (number of decimal places) and the rounding mode
-        return bigDecimal.setScale(4, RoundingMode.CEILING)
+    fun Double.roundUpToFourDecimals(): Double {
+        return round(this * 10000) / 10000.0
     }
 }

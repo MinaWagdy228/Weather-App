@@ -14,7 +14,7 @@ import com.example.wizzar.ui.theme.Typography
 @Composable
 fun FavoritesScreen() {
     Box(
-        modifier = Modifier.fillMaxSize().background(BackgroundDark),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(text = "Favorites Screen", color = TextWhite, style = Typography.headlineMedium)

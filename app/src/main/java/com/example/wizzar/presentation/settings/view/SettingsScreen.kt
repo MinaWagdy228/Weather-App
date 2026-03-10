@@ -14,7 +14,7 @@ import com.example.wizzar.ui.theme.Typography
 @Composable
 fun SettingsScreen() {
     Box(
-        modifier = Modifier.fillMaxSize().background(BackgroundDark),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(text = "Settings Screen", color = TextWhite, style = Typography.headlineMedium)

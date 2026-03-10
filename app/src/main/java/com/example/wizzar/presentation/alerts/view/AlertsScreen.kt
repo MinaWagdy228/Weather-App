@@ -14,7 +14,7 @@ import com.example.wizzar.ui.theme.Typography
 @Composable
 fun AlertsScreen() {
     Box(
-        modifier = Modifier.fillMaxSize().background(BackgroundDark),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(text = "Alerts Screen", color = TextWhite, style = Typography.headlineMedium)

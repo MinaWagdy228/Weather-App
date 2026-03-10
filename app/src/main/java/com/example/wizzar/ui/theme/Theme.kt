@@ -41,18 +41,17 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun WizzarTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Disabled dynamic color by default so the strict React design colors aren't overridden by Android 12+ Monet
+    isDaytime: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            // If dynamic color is used, we still respect the daytime state
+            if (!isDaytime) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        // Force Dark Scheme to match the React web implementation styling
-        darkTheme -> DarkColorScheme
+        isDaytime -> LightColorScheme
         else -> DarkColorScheme
     }
 

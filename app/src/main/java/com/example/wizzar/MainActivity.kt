@@ -25,14 +25,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WizzarTheme {
-                val navController = rememberNavController()
-                val mainViewModel: MainViewModel = hiltViewModel()
+            val navController = rememberNavController()
+            val mainViewModel: MainViewModel = hiltViewModel()
 
-                // Observe daytime state at the absolute root of the app
-                val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
+            val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
+
+            WizzarTheme(isDaytime = isDaytime) {
 
                 Box(modifier = Modifier.fillMaxSize()) {
+
                     if (isDaytime) {
                         SunnyBackground()
                     } else {

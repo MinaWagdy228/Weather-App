@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.wizzar.data.dataSource.local.LocationProviderImpl
 import com.example.wizzar.data.dataSource.local.dao.CurrentWeatherDao
+import com.example.wizzar.data.dataSource.local.dao.FavoriteLocationDao
 import com.example.wizzar.data.dataSource.local.dao.ForecastDao
 import com.example.wizzar.data.dataSource.local.db.WeatherDatabase
 import com.example.wizzar.domain.location.LocationProvider
@@ -63,4 +64,10 @@ object DatabaseModule {
         return LocationServiceCheckerImpl(context)
     }
 
+    @Provides
+    fun provideFavoriteLocationDao(
+        database: WeatherDatabase
+    ): FavoriteLocationDao {
+        return database.favoriteLocationDao()
+    }
 }

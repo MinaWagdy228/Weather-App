@@ -3,8 +3,10 @@ package com.example.wizzar.data.wrapper
 import com.example.wizzar.data.dataSource.local.entity.CurrentWeatherEntity
 import com.example.wizzar.data.dataSource.local.entity.ForecastEntity
 import com.example.wizzar.data.dataSource.remote.dto.ForecastResponseDto
+import com.example.wizzar.data.dataSource.remote.dto.GeocodingDto
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.HourlyForecast
+import com.example.wizzar.domain.model.LocationSearchResult
 
 fun ForecastResponseDto.toCurrentWeatherEntity(requestedLatitude : Double, requestedLongitude : Double): CurrentWeatherEntity {
     val current = list.first()
@@ -112,5 +114,17 @@ fun HourlyForecast.toEntity(cityName: String, latitude : Double, longitude: Doub
         weatherId = weatherConditionId,
         longitude = longitude,
         latitude = latitude
+    )
+}
+
+fun GeocodingDto.toDomain(): LocationSearchResult {
+    val localizedName = localNames?.get("en") ?: name
+    return LocationSearchResult(
+        name = name,
+        country = country,
+        state = state,
+        latitude = lat,
+        longitude = lon,
+        localizedName = localizedName
     )
 }

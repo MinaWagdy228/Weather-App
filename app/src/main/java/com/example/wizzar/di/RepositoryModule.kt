@@ -1,6 +1,8 @@
 package com.example.wizzar.di
 
+import com.example.wizzar.data.repository.FavoritesRepositoryImpl
 import com.example.wizzar.data.repository.WeatherRepositoryImpl
+import com.example.wizzar.domain.repository.FavoritesRepository
 import com.example.wizzar.domain.repository.WeatherRepository
 import dagger.Binds
 import dagger.Module
@@ -17,5 +19,11 @@ abstract class RepositoryModule {
     abstract fun bindWeatherRepository(
         weatherRepositoryImpl: WeatherRepositoryImpl
     ): WeatherRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFavoritesRepository(
+        favoritesRepositoryImpl: FavoritesRepositoryImpl
+    ): FavoritesRepository
 
 }

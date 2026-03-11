@@ -1,10 +1,13 @@
 package com.example.wizzar.presentation.map.view
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wizzar.data.dataSource.local.datastore.LocationMode
 import com.example.wizzar.domain.model.LocationSearchResult
 import com.example.wizzar.domain.repository.WeatherRepository
 import com.example.wizzar.domain.usecase.ManageFavoritesUseCase
+import com.example.wizzar.domain.usecase.ManageSettingsUseCase
 import com.example.wizzar.presentation.map.MapUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -17,8 +20,13 @@ import kotlin.math.round
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val manageFavoritesUseCase: ManageFavoritesUseCase
+    private val manageFavoritesUseCase: ManageFavoritesUseCase,
+    private val manageSettingsUseCase: ManageSettingsUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    // Retrieve the source (settings vs favorites) passed from navigation
+    private val source: String = savedStateHandle["source"] ?: "favorites"
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
@@ -92,13 +100,26 @@ class MapViewModel @Inject constructor(
         val location = _uiState.value.selectedLocation ?: return
 
         viewModelScope.launch {
-            manageFavoritesUseCase.addFavoriteLocation(
-                lat = location.latitude,
-                lon = location.longitude,
-                cityName = location.localizedName ?: location.name
-            )
+            if (source == "settings") {
+                // Flow A: Update Global Settings
+                manageSettingsUseCase.updateLocationMode(
+                    LocationMode.MAP,
+                    location.latitude,
+                    location.longitude
+                )
 
-            _uiEvent.emit(MapUiEvent.NavigateBackWithSuccess("${location.localizedName ?: location.name} saved!"))
+                _uiEvent.emit(MapUiEvent.NavigateBackWithSuccess("Home location updated!"))
+
+            } else {
+                // Flow B: Add to Favorites List
+                manageFavoritesUseCase.addFavoriteLocation(
+                    lat = location.latitude,
+                    lon = location.longitude,
+                    cityName = location.localizedName ?: location.name
+                )
+
+                _uiEvent.emit(MapUiEvent.NavigateBackWithSuccess("${location.localizedName ?: location.name} saved!"))
+            }
         }
     }
 }

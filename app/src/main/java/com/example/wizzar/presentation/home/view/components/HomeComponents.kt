@@ -14,15 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.wizzar.R
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
 import com.example.wizzar.presentation.common.glassmorphic
 import com.example.wizzar.presentation.common.mapOpenWeatherIcon
+import com.example.wizzar.presentation.common.toLocalizedNumbers
 import com.example.wizzar.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -55,7 +58,7 @@ fun HeaderSection(location: String) {
 }
 
 @Composable
-fun CurrentWeatherSection(currentWeather: CurrentWeather) {
+fun CurrentWeatherSection(currentWeather: CurrentWeather, tempUnit: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,7 +74,7 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather) {
         )
 
         Text(
-            text = "${currentWeather.temperature.roundToInt()}°",
+            text = "${currentWeather.temperature.roundToInt().toLocalizedNumbers()}$tempUnit",
             color = TextWhite,
             style = Typography.displayLarge,
             modifier = Modifier.padding(top = 16.dp)
@@ -85,7 +88,12 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather) {
         )
 
         Text(
-            text = "Feels like ${currentWeather.feelsLike.roundToInt()}° · High ${currentWeather.maxTemp.roundToInt()}° · Low ${currentWeather.minTemp.roundToInt()}°",
+            text = stringResource(
+                R.string.feels_like_high_low,
+                "${currentWeather.feelsLike.roundToInt().toLocalizedNumbers()}$tempUnit",
+                "${currentWeather.maxTemp.roundToInt().toLocalizedNumbers()}$tempUnit",
+                "${currentWeather.minTemp.roundToInt().toLocalizedNumbers()}$tempUnit"
+            ),
             color = TextGray,
             style = Typography.bodyMedium,
             modifier = Modifier.padding(top = 8.dp)
@@ -94,7 +102,7 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather) {
 }
 
 @Composable
-fun WeatherDetailsGrid(currentWeather: CurrentWeather) {
+fun WeatherDetailsGrid(currentWeather: CurrentWeather, windUnit: String) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -104,15 +112,15 @@ fun WeatherDetailsGrid(currentWeather: CurrentWeather) {
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 icon = Icons.Outlined.WaterDrop,
                 iconTint = LightBlueAccent,
-                value = "${currentWeather.humidity}%",
-                label = "HUMIDITY"
+                value = "${currentWeather.humidity.toLocalizedNumbers()}%",
+                label = stringResource(R.string.humidity)
             )
             DetailCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 icon = Icons.Outlined.Air,
                 iconTint = PurpleAccent,
-                value = "${currentWeather.wind} m/s",
-                label = "WIND SPEED"
+                value = "${currentWeather.wind.toLocalizedNumbers()} $windUnit",
+                label = stringResource(R.string.wind_speed)
             )
         }
 
@@ -124,15 +132,15 @@ fun WeatherDetailsGrid(currentWeather: CurrentWeather) {
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 icon = Icons.Outlined.Thermostat,
                 iconTint = AlertRed,
-                value = "${currentWeather.pressure} hPa",
-                label = "PRESSURE"
+                value = "${currentWeather.pressure.toLocalizedNumbers()} hPa",
+                label = stringResource(R.string.pressure)
             )
             SunriseSunsetCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 sunrise = currentWeather.sunrise,
                 sunset = currentWeather.sunset,
-                sunriseLabel = "SUNRISE",
-                sunsetLabel = "SUNSET"
+                sunriseLabel = stringResource(R.string.sunrise),
+                sunsetLabel = stringResource(R.string.sunset)
             )
         }
     }
@@ -159,8 +167,8 @@ fun DetailCard(modifier: Modifier, icon: ImageVector, iconTint: Color, value: St
 @Composable
 fun SunriseSunsetCard(modifier: Modifier, sunrise: Long, sunset: Long, sunriseLabel: String, sunsetLabel: String) {
     val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-    val sunriseTime = timeFormat.format(Date(sunrise * 1000L))
-    val sunsetTime = timeFormat.format(Date(sunset * 1000L))
+    val sunriseTime = timeFormat.format(Date(sunrise * 1000L)).toLocalizedNumbers()
+    val sunsetTime = timeFormat.format(Date(sunset * 1000L)).toLocalizedNumbers()
 
     Box(modifier = modifier.glassmorphic(RoundedCornerShape(16.dp))) {
         Column(
@@ -190,23 +198,23 @@ fun SunriseSunsetCard(modifier: Modifier, sunrise: Long, sunset: Long, sunriseLa
 }
 
 @Composable
-fun HourlyForecastSection(hourly: List<HourlyForecast>) {
+fun HourlyForecastSection(hourly: List<HourlyForecast>, tempUnit: String) {
     val timeFormat = SimpleDateFormat("h a", Locale.getDefault())
 
     Column {
-        SectionHeader("Today's Forecast")
+        SectionHeader(stringResource(R.string.todays_forecast))
         Spacer(modifier = Modifier.height(16.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(hourly.take(8)) { item ->
-                HourlyItemCard(item, timeFormat)
+                HourlyItemCard(item, timeFormat, tempUnit)
             }
         }
     }
 }
 
 @Composable
-fun HourlyItemCard(item: HourlyForecast, timeFormat: SimpleDateFormat) {
-    val timeString = timeFormat.format(Date(item.time * 1000L))
+fun HourlyItemCard(item: HourlyForecast, timeFormat: SimpleDateFormat, tempUnit: String) {
+    val timeString = timeFormat.format(Date(item.time * 1000L)).toLocalizedNumbers()
 
     Column(
         modifier = Modifier
@@ -223,16 +231,16 @@ fun HourlyItemCard(item: HourlyForecast, timeFormat: SimpleDateFormat) {
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "${item.temperature.roundToInt()}°", color = TextWhite, fontWeight = FontWeight.Bold)
+        Text(text = "${item.temperature.roundToInt().toLocalizedNumbers()}$tempUnit", color = TextWhite, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
-fun DailyForecastSection(daily: List<DailyForecast>) {
+fun DailyForecastSection(daily: List<DailyForecast>, tempUnit: String) {
     val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
 
     Column {
-        SectionHeader("5-Day Forecast")
+        SectionHeader(stringResource(R.string.five_day_forecast))
         Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier
@@ -242,7 +250,7 @@ fun DailyForecastSection(daily: List<DailyForecast>) {
         ) {
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
                 daily.take(5).forEach { item ->
-                    DailyItemRow(item, dayFormat)
+                    DailyItemRow(item, dayFormat, tempUnit)
                 }
             }
         }
@@ -250,7 +258,7 @@ fun DailyForecastSection(daily: List<DailyForecast>) {
 }
 
 @Composable
-fun DailyItemRow(item: DailyForecast, dayFormat: SimpleDateFormat) {
+fun DailyItemRow(item: DailyForecast, dayFormat: SimpleDateFormat, tempUnit: String) {
     val dayString = dayFormat.format(Date(item.date * 1000L))
 
     Row(
@@ -269,7 +277,7 @@ fun DailyItemRow(item: DailyForecast, dayFormat: SimpleDateFormat) {
         )
 
         Text(
-            text = "${item.minTemp.roundToInt()}° / ${item.maxTemp.roundToInt()}°",
+            text = "${item.minTemp.roundToInt().toLocalizedNumbers()}$tempUnit / ${item.maxTemp.roundToInt().toLocalizedNumbers()}$tempUnit",
             color = TextWhite,
             style = Typography.bodyLarge,
             modifier = Modifier.weight(1f),

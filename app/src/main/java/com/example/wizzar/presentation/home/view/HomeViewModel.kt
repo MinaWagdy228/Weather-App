@@ -3,8 +3,11 @@ package com.example.wizzar.presentation.home.view
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wizzar.data.dataSource.local.datastore.AppLanguage
+import com.example.wizzar.data.dataSource.local.datastore.LocationMode
 import com.example.wizzar.domain.location.LocationProvider
 import com.example.wizzar.domain.model.Result
+import com.example.wizzar.domain.usecase.ManageSettingsUseCase
 import com.example.wizzar.domain.usecase.WeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -13,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.round
@@ -20,7 +25,8 @@ import kotlin.math.round
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val weatherUseCase: WeatherUseCase,
-    private val locationProvider: LocationProvider
+    private val locationProvider: LocationProvider,
+    private val manageSettingsUseCase: ManageSettingsUseCase
 ) : ViewModel() {
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -41,32 +47,46 @@ class HomeViewModel @Inject constructor(
     fun fetchWeatherForCurrentLocation(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _isRefreshing.value = true
-            val loc = locationProvider.getCurrentLocation()
 
-            if (loc.isValid()) {
-                Log.d("HomeViewModel", "Original coordinates: lat=${loc.latitude}, lon=${loc.longitude}")
-                val stableLat = loc.latitude.roundUpToFourDecimals()
-                val stableLon = loc.longitude.roundUpToFourDecimals()
-                Log.d("HomeViewModel", "Stable coordinates: lat=$stableLat, lon=$stableLon")
+            val settings = manageSettingsUseCase.observeSettings().first()
+            val apiLanguage = if (settings.language == AppLanguage.ARABIC) "ar" else "en"
 
-                startObservingWeather(stableLat, stableLon)
+            val targetLat: Double
+            val targetLon: Double
 
-                when (val result =
-                    weatherUseCase.refreshWeather(stableLat, stableLon, forceRefresh)) {
-                    is Result.Error -> {
-                        Log.e("HomeViewModel", "Refresh failed: ${result.error.message}")
-                        _uiEvent.emit(result.error.message)
-                        if (_uiState.value is HomeUiState.Loading) {
-                            _uiState.value = HomeUiState.Error(result.error.message)
-                        }
-                    }
-
-                    is Result.Success -> Log.d("HomeViewModel", "Weather refreshed successfully")
-                }
+            if (settings.locationMode == LocationMode.MAP && settings.mapLat != null && settings.mapLon != null) {
+                targetLat = settings.mapLat
+                targetLon = settings.mapLon
             } else {
-                _uiState.value =
-                    HomeUiState.Error("Could not determine current location. Ensure GPS is enabled.")
+                val loc = locationProvider.getCurrentLocation()
+                if (loc.isValid()) {
+                    targetLat = loc.latitude
+                    targetLon = loc.longitude
+                } else {
+                    _uiState.value =
+                        HomeUiState.Error("Could not determine current location. Ensure GPS is enabled.")
+                    _isRefreshing.value = false
+                    return@launch
+                }
             }
+
+            val stableLat = targetLat.roundUpToFourDecimals()
+            val stableLon = targetLon.roundUpToFourDecimals()
+
+            startObservingWeather(stableLat, stableLon)
+
+            when (val result =
+                weatherUseCase.refreshWeather(stableLat, stableLon, apiLanguage, forceRefresh)) {
+                is Result.Error -> {
+                    _uiEvent.emit(result.error.message)
+                    if (_uiState.value is HomeUiState.Loading) {
+                        _uiState.value = HomeUiState.Error(result.error.message)
+                    }
+                }
+
+                is Result.Success -> Log.d("HomeViewModel", "Weather refreshed successfully")
+            }
+
             _isRefreshing.value = false
         }
     }
@@ -74,23 +94,34 @@ class HomeViewModel @Inject constructor(
     private fun startObservingWeather(lat: Double, lon: Double) {
         observeJob?.cancel()
         observeJob = viewModelScope.launch {
-            weatherUseCase.observeWeather(lat, lon).collect { weatherData ->
+            combine(
+                weatherUseCase.observeWeather(lat, lon),
+                manageSettingsUseCase.observeSettings()
+            ) { weatherData, settings ->
                 if (weatherData != null) {
-                    _uiState.value = HomeUiState.Success(
+                    HomeUiState.Success(
                         currentWeather = weatherData.currentWeather,
                         hourlyForecast = weatherData.hourlyForecast,
-                        dailyForecast = weatherData.dailyForecast
+                        dailyForecast = weatherData.dailyForecast,
+                        tempUnit = settings.tempUnit,
+                        windUnit = settings.windUnit
                     )
                 } else {
                     if (_uiState.value !is HomeUiState.Error) {
-                        _uiState.value = HomeUiState.Loading
+                        HomeUiState.Loading
+                    } else {
+                        null
                     }
+                }
+            }.collect { state ->
+                if (state != null) {
+                    _uiState.value = state
                 }
             }
         }
     }
 
-    fun Double.roundUpToFourDecimals(): Double {
+    private fun Double.roundUpToFourDecimals(): Double {
         return round(this * 10000) / 10000.0
     }
 }

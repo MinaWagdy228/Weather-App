@@ -2,14 +2,16 @@ package com.example.wizzar.presentation.favorites.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.wizzar.R
 import com.example.wizzar.presentation.home.view.HomeScreenContent
 import com.example.wizzar.ui.theme.PrimaryBlue
 
@@ -24,12 +26,12 @@ fun FavoriteDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("City Weather") },
+                title = { Text(stringResource(R.string.city_weather_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Navigate Back"
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.navigate_back_desc)
                         )
                     }
                 },
@@ -66,7 +68,9 @@ fun FavoriteDetailsScreen(
                     HomeScreenContent(
                         currentWeather = currentState.weatherData.currentWeather,
                         hourlyForecast = currentState.weatherData.hourlyForecast,
-                        dailyForecast = currentState.weatherData.dailyForecast
+                        dailyForecast = currentState.weatherData.dailyForecast,
+                        tempUnit = currentState.tempUnit,
+                        windUnit = currentState.windUnit
                     )
                 }
             }

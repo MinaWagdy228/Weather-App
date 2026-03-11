@@ -29,10 +29,9 @@ fun NavGraph(
             HomeScreen()
         }
 
-        // UPDATED: Connected the Favorites Screen navigation lambdas
         composable(ScreenRoutes.Favorites.route) {
             FavoritesScreen(onNavigateToMap = {
-                navController.navigate(ScreenRoutes.Map.route)
+                navController.navigate(ScreenRoutes.Map.createRoute("favorites"))
             }, onNavigateToDetails = { lat, lon ->
                 navController.navigate(ScreenRoutes.FavoriteDetails.createRoute(lat, lon))
             })
@@ -43,11 +42,16 @@ fun NavGraph(
         }
 
         composable(ScreenRoutes.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(
+                onNavigateToMap = {
+                    navController.navigate(ScreenRoutes.Map.createRoute("settings"))
+                }
+            )
         }
-
-        // NEW: The Map Screen
-        composable(ScreenRoutes.Map.route) {
+        composable(
+            route = ScreenRoutes.Map.route,
+            arguments = listOf(navArgument("source") { defaultValue = "favorites" })
+        ) {
             MapScreen(
                 onNavigateBack = { message ->
                     // Optionally, you could pass this message back to Favorites via SavedStateHandle,
@@ -56,12 +60,12 @@ fun NavGraph(
                 })
         }
 
-// The Favorite Details Screen
         composable(
             route = ScreenRoutes.FavoriteDetails.route,
             arguments = listOf(
                 navArgument("lat") { type = NavType.FloatType },
-                navArgument("lon") { type = NavType.FloatType })) {
+                navArgument("lon") { type = NavType.FloatType })
+        ) {
             // The ViewModel automatically catches the arguments from here via SavedStateHandle!
             FavoriteDetailsScreen(
                 onBackClick = { navController.popBackStack() })

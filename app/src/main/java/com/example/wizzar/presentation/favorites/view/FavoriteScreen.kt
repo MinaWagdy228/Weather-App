@@ -2,14 +2,12 @@ package com.example.wizzar.presentation.favorites.view
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -18,9 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.wizzar.R
 import com.example.wizzar.data.dataSource.local.entity.FavoriteLocationEntity
 import com.example.wizzar.presentation.common.glassmorphic
 import kotlinx.coroutines.launch
@@ -36,19 +37,20 @@ fun FavoritesScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text("Favorite Locations") },
+                title = { Text(stringResource(R.string.favorite_locations_title)) },
                 actions = {
                     // The Top-Right button to navigate to the Map Screen
                     IconButton(onClick = onNavigateToMap) {
                         Icon(
                             imageVector = Icons.Default.FavoriteBorder,
-                            contentDescription = "Add Favorite"
+                            contentDescription = stringResource(R.string.add_favorite_desc)
                         )
                     }
                 }
@@ -64,7 +66,7 @@ fun FavoritesScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "No favorites yet. Click the heart icon to add one!",
+                    stringResource(R.string.no_favorites_yet),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -92,8 +94,8 @@ fun FavoritesScreen(
                                 // 2. Show the Snackbar with an Undo button
                                 coroutineScope.launch {
                                     val result = snackbarHostState.showSnackbar(
-                                        message = "${favorite.cityName} deleted",
-                                        actionLabel = "Undo",
+                                        message = context.getString(R.string.item_deleted, favorite.cityName),
+                                        actionLabel = context.getString(R.string.undo),
                                         duration = SnackbarDuration.Short // Or SnackbarDuration.Long
                                     )
                                     // 3. If they clicked Undo, restore the item
@@ -123,7 +125,7 @@ fun FavoritesScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = "Delete",
+                                    contentDescription = stringResource(R.string.delete_desc),
                                     tint = Color.White
                                 )
                             }
@@ -164,7 +166,7 @@ fun FavoriteCityCard(
         ) {
             Icon(
                 imageVector = Icons.Default.Favorite,
-                contentDescription = "a Favorited City",
+                contentDescription = stringResource(R.string.favorited_city_desc),
             )
             Text(
                 text = favorite.cityName,
@@ -173,7 +175,7 @@ fun FavoriteCityCard(
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                contentDescription = "Check City's weather details",
+                contentDescription = stringResource(R.string.check_details_desc),
             )
             // You can optionally add a small weather icon or temperature preview here later!
         }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wizzar.domain.model.Result
 import com.example.wizzar.domain.model.WeatherData
 import com.example.wizzar.domain.repository.WeatherRepository
+import com.example.wizzar.domain.usecase.ManageSettingsUseCase
 import com.example.wizzar.domain.usecase.WeatherUseCase
 import com.example.wizzar.presentation.home.view.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,12 +15,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteDetailsViewModel @Inject constructor(
     private val weatherUseCase: WeatherUseCase,
+    private val manageSettingsUseCase: ManageSettingsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -60,13 +63,26 @@ class FavoriteDetailsViewModel @Inject constructor(
     private fun startObservingFavoriteDetailsWeather(lat: Double, lon: Double) {
         observeJob?.cancel()
         observeJob = viewModelScope.launch {
-            weatherUseCase.observeWeather(lat, lon).collect { weatherData ->
+            combine(
+                weatherUseCase.observeWeather(lat, lon),
+                manageSettingsUseCase.observeSettings()
+            ) { weatherData, settings ->
                 if (weatherData != null) {
-                    _uiState.value = FavoriteDetailsState.Success(
-                        weatherData
+                    FavoriteDetailsState.Success(
+                        weatherData,
+                        settings.tempUnit,
+                        settings.windUnit
                     )
                 } else {
-                    _uiState.value = FavoriteDetailsState.Loading
+                    if (_uiState.value !is FavoriteDetailsState.Error) {
+                        FavoriteDetailsState.Loading
+                    } else {
+                        null
+                    }
+                }
+            }.collect { state ->
+                if (state != null) {
+                    _uiState.value = state
                 }
             }
         }

@@ -12,7 +12,12 @@ class RefreshWeatherUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val locationServiceChecker: LocationServiceChecker
 ) {
-    suspend fun execute(lat : Double, lon : Double, forceRefresh: Boolean = false): Result<WeatherData> {
+    suspend fun execute(
+        lat: Double,
+        lon: Double,
+        lang: String = "en",
+        forceRefresh: Boolean = false
+    ): Result<WeatherData> {
         // BUSINESS RULE 0: Check if location service is enabled
         if (!locationServiceChecker.isEnabled()) {
             return Result.Error(DomainError.LocationServiceDisabledError())
@@ -27,7 +32,7 @@ class RefreshWeatherUseCase @Inject constructor(
 
         // BUSINESS RULE 3: Fetch fresh data
         return try {
-            val freshWeather = weatherRepository.fetchWeatherFromApi(lat, lon)
+            val freshWeather = weatherRepository.fetchWeatherFromApi(lat, lon, lang)
 
             // BUSINESS RULE 4: Validate completeness
             if (!freshWeather.isComplete()) {

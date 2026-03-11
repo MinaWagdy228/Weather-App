@@ -1,8 +1,9 @@
-package com.example.wizzar
+package com.example.wizzar.presentation.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -21,7 +22,7 @@ import com.example.wizzar.ui.theme.WizzarTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
 
             WizzarTheme(isDaytime = isDaytime) {
 
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.Companion.fillMaxSize()) {
 
                     if (isDaytime) {
                         SunnyBackground()
@@ -41,8 +42,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     Scaffold(
-                        bottomBar = { WizzarNavigationBar(navController = navController, mainViewModel = mainViewModel) },
-                        containerColor = Color.Transparent
+                        bottomBar = {
+                            WizzarNavigationBar(
+                                navController = navController,
+                                mainViewModel = mainViewModel
+                            )
+                        },
+                        containerColor = Color.Companion.Transparent
                     ) { innerPadding ->
                         NavGraph(navController = navController, paddingValues = innerPadding)
                     }

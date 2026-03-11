@@ -15,7 +15,11 @@ sealed class ScreenRoutes(val route: String, val title: String, val icon: ImageV
     object Alerts : ScreenRoutes("alerts", "Alerts", Icons.Default.Notifications)
     object Settings : ScreenRoutes("settings", "Settings", Icons.Default.Settings)
 
-    object Map : ScreenRoutes("map", "Map", Icons.Default.Place)
+    object Map : ScreenRoutes("map?source={source}", "Map", Icons.Default.Place) {
+        fun createRoute(source: String): String {
+            return "map?source=$source"
+        }
+    }
 
     // NEW: The Details Screen route. It uses a dynamic path to accept coordinates.
     object FavoriteDetails : ScreenRoutes("favorite_details/{lat}/{lon}", "Details", Icons.Default.Info) {

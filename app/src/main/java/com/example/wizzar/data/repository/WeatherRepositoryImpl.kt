@@ -62,7 +62,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override suspend fun fetchWeatherFromApi(lat: Double, lon: Double, lang: String): WeatherData {
         val forecastResponse =
-            weatherService.getForecast(lat = lat, lon = lon, apiKey = API_KEY, lang = "en")
+            weatherService.getForecast(lat = lat, lon = lon, apiKey = API_KEY, lang = lang)
 
         // Maps using exact GPS coordinates to override API shifts
         val currentWeather = forecastResponse.toCurrentWeatherEntity(lat, lon).toDomain()

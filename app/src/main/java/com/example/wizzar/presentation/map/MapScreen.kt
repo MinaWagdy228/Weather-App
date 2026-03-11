@@ -16,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.wizzar.R
 import com.example.wizzar.domain.model.LocationSearchResult
 import com.example.wizzar.presentation.map.view.MapUiEvent
 import com.example.wizzar.presentation.map.view.MapViewModel
@@ -104,8 +106,8 @@ fun MapScreen(
             OutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = viewModel::onSearchQueryChanged,
-                placeholder = { Text("Search for a city...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                placeholder = { Text(stringResource(R.string.search_hint)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_desc)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)),
@@ -161,7 +163,7 @@ fun MapScreen(
                 Icon(Icons.Default.Check, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Select ${state.selectedLocation?.localizedName ?: state.selectedLocation?.name}",
+                    text = stringResource(R.string.select_location_btn, state.selectedLocation?.localizedName ?: state.selectedLocation?.name.orEmpty()),
                     style = MaterialTheme.typography.titleMedium
                 )
             }

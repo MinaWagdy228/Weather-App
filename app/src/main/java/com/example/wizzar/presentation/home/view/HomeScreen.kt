@@ -19,6 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.wizzar.data.dataSource.local.datastore.TempUnit
+import com.example.wizzar.data.dataSource.local.datastore.WindUnit
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
@@ -99,7 +101,9 @@ fun HomeScreen(
                     HomeScreenContent(
                         currentWeather = state.currentWeather,
                         hourlyForecast = state.hourlyForecast,
-                        dailyForecast = state.dailyForecast
+                        dailyForecast = state.dailyForecast,
+                        tempUnit = state.tempUnit,
+                        windUnit = state.windUnit
                     )
                 }
             }
@@ -111,8 +115,20 @@ fun HomeScreen(
 fun HomeScreenContent(
     currentWeather: CurrentWeather,
     hourlyForecast: List<HourlyForecast>,
-    dailyForecast: List<DailyForecast>
+    dailyForecast: List<DailyForecast>,
+    tempUnit: TempUnit,
+    windUnit: WindUnit
 ) {
+    val tempUnitSymbol = when(tempUnit) {
+        TempUnit.CELSIUS -> "°C"
+        TempUnit.FAHRENHEIT -> "°F"
+        TempUnit.KELVIN -> "°K"
+    }
+    val windUnitSymbol = when(windUnit) {
+        WindUnit.METER_SEC -> "m/s"
+        WindUnit.MILE_HOUR -> "mph"
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -121,9 +137,9 @@ fun HomeScreenContent(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item { HeaderSection(currentWeather.city) }
-        item { CurrentWeatherSection(currentWeather) }
-        item { WeatherDetailsGrid(currentWeather) }
-        item { HourlyForecastSection(hourlyForecast) }
-        item { DailyForecastSection(dailyForecast) }
+        item { CurrentWeatherSection(currentWeather, tempUnitSymbol) }
+        item { WeatherDetailsGrid(currentWeather, windUnitSymbol) }
+        item { HourlyForecastSection(hourlyForecast, tempUnitSymbol) }
+        item { DailyForecastSection(dailyForecast, tempUnitSymbol) }
     }
 }

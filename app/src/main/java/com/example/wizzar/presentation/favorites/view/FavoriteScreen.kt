@@ -6,8 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.wizzar.data.dataSource.local.entity.FavoriteLocationEntity
+import com.example.wizzar.presentation.common.glassmorphic
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,12 +34,12 @@ fun FavoritesScreen(
 ) {
     val favorites by viewModel.favoritesList.collectAsStateWithLifecycle()
 
-    // UI state for showing the 5-second Undo Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = { Text("Favorite Locations") },
@@ -52,12 +57,22 @@ fun FavoritesScreen(
     ) { paddingValues ->
 
         if (favorites.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
-                Text("No favorites yet. Click the heart icon to add one!", style = MaterialTheme.typography.bodyLarge)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "No favorites yet. Click the heart icon to add one!",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -106,13 +121,22 @@ fun FavoritesScreen(
                                     .padding(end = 24.dp),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.White)
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color.White
+                                )
                             }
                         },
                         content = {
                             FavoriteCityCard(
                                 favorite = favorite,
-                                onClick = { onNavigateToDetails(favorite.latitude, favorite.longitude) }
+                                onClick = {
+                                    onNavigateToDetails(
+                                        favorite.latitude,
+                                        favorite.longitude
+                                    )
+                                }
                             )
                         }
                     )
@@ -128,20 +152,28 @@ fun FavoriteCityCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }, // Navigates to the details screen!
+        modifier = Modifier.glassmorphic(RoundedCornerShape(16.dp)),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = onClick, // Navigates to the details screen!
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "a Favorited City",
+            )
             Text(
                 text = favorite.cityName,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                contentDescription = "Check City's weather details",
             )
             // You can optionally add a small weather icon or temperature preview here later!
         }

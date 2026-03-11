@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wizzar.data.dataSource.local.entity.FavoriteLocationEntity
 import com.example.wizzar.domain.usecase.ManageFavoritesUseCase
+import com.example.wizzar.domain.usecase.WeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val manageFavoritesUseCase: ManageFavoritesUseCase
+    private val manageFavoritesUseCase: ManageFavoritesUseCase,
 ) : ViewModel() {
 
-    // 1. STATE: Observe the Room database.
-    // This automatically updates the UI instantly when the Map Screen saves a new city!
     val favoritesList: StateFlow<List<FavoriteLocationEntity>> = manageFavoritesUseCase.observeFavorites()
         .stateIn(
             scope = viewModelScope,

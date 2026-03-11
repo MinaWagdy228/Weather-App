@@ -1,5 +1,6 @@
 package com.example.wizzar.domain.usecase
 
+import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
 import com.example.wizzar.domain.model.WeatherData
@@ -54,7 +55,6 @@ class WeatherUseCase @Inject constructor(
             )
         }
     }
-
     suspend fun refreshWeather(latitude : Double, longitude : Double, forceRefresh: Boolean = false): Result<WeatherData> {
         return refreshWeatherUseCase.execute(latitude, longitude, forceRefresh)
     }

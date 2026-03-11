@@ -12,7 +12,6 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,8 +22,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
-import com.example.wizzar.presentation.common.StarryBackground
-import com.example.wizzar.presentation.common.SunnyBackground
 import com.example.wizzar.presentation.home.view.components.*
 import com.example.wizzar.ui.theme.AlertRed
 import com.example.wizzar.ui.theme.PrimaryBlue

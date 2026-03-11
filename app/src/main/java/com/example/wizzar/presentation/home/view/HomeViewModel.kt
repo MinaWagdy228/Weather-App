@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.math.RoundingMode
 import javax.inject.Inject
 import kotlin.math.round
 
@@ -46,10 +44,9 @@ class HomeViewModel @Inject constructor(
             val loc = locationProvider.getCurrentLocation()
 
             if (loc.isValid()) {
-                // 👈 THE FIX: Lock coordinates to 4 decimal places (11 meters precision)
                 Log.d("HomeViewModel", "Original coordinates: lat=${loc.latitude}, lon=${loc.longitude}")
-                val stableLat = loc.latitude.roundUpToFourDecimals().toDouble()
-                val stableLon = loc.longitude.roundUpToFourDecimals().toDouble()
+                val stableLat = loc.latitude.roundUpToFourDecimals()
+                val stableLon = loc.longitude.roundUpToFourDecimals()
                 Log.d("HomeViewModel", "Stable coordinates: lat=$stableLat, lon=$stableLon")
 
                 startObservingWeather(stableLat, stableLon)

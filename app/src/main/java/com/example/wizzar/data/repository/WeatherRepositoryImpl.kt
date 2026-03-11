@@ -86,13 +86,11 @@ class WeatherRepositoryImpl @Inject constructor(
     }
     // NEW: Auto-Complete Search Implementation
     override suspend fun searchLocations(query: String): List<LocationSearchResult> {
-
         return try {
             val dtoList = weatherService.searchCityByName(query = query, apiKey = API_KEY)
             dtoList.map {
                 it.toDomain()
             }
-
         } catch (e: Exception) {
             emptyList()
         }
@@ -100,7 +98,6 @@ class WeatherRepositoryImpl @Inject constructor(
 
     // NEW: Map Pin Drop Implementation
     override suspend fun getCityNameFromCoordinates(
-
         lat: Double,
         lon: Double,
         lang: String
@@ -114,7 +111,6 @@ class WeatherRepositoryImpl @Inject constructor(
                 location?.name
             }
         } catch (e: Exception) {
-
             null
         }
     }

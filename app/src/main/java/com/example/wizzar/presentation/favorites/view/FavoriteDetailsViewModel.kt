@@ -1,0 +1,74 @@
+package com.example.wizzar.presentation.favorites.view
+
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.wizzar.domain.model.Result
+import com.example.wizzar.domain.model.WeatherData
+import com.example.wizzar.domain.repository.WeatherRepository
+import com.example.wizzar.domain.usecase.WeatherUseCase
+import com.example.wizzar.presentation.home.view.HomeUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class FavoriteDetailsViewModel @Inject constructor(
+    private val weatherUseCase: WeatherUseCase,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    // Retrieve the coordinates passed from the NavGraph
+    private val lat: Double = savedStateHandle.get<Float>("lat")?.toDouble() ?: 0.0
+    private val lon: Double = savedStateHandle.get<Float>("lon")?.toDouble() ?: 0.0
+
+    private val _uiState = MutableStateFlow<FavoriteDetailsState>(FavoriteDetailsState.Loading)
+    val uiState: StateFlow<FavoriteDetailsState> = _uiState.asStateFlow()
+    private var observeJob: Job? = null
+
+    init {
+        fetchWeatherForFavorite()
+    }
+
+    private fun fetchWeatherForFavorite() {
+        viewModelScope.launch {
+            _uiState.value = FavoriteDetailsState.Loading
+            try {
+                startObservingFavoriteDetailsWeather(lat, lon)
+                when (val result =
+                    weatherUseCase.refreshWeather(lat, lon, forceRefresh = true)) {
+                    is Result.Error -> {
+                        Log.e("HomeViewModel", "Refresh failed: ${result.error.message}")
+                        _uiState.value =
+                            FavoriteDetailsState.Error("Failed to refresh weather: ${result.error.message}")
+                    }
+
+                    is Result.Success -> Log.d("HomeViewModel", "Weather refreshed successfully")
+                }
+            } catch (e: Exception) {
+                _uiState.value =
+                    FavoriteDetailsState.Error("Failed to load weather: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    private fun startObservingFavoriteDetailsWeather(lat: Double, lon: Double) {
+        observeJob?.cancel()
+        observeJob = viewModelScope.launch {
+            weatherUseCase.observeWeather(lat, lon).collect { weatherData ->
+                if (weatherData != null) {
+                    _uiState.value = FavoriteDetailsState.Success(
+                        weatherData
+                    )
+                } else {
+                    _uiState.value = FavoriteDetailsState.Loading
+                }
+            }
+        }
+    }
+}

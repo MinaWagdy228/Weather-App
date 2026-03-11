@@ -1,22 +1,149 @@
 package com.example.wizzar.presentation.favorites.view
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.wizzar.ui.theme.BackgroundDark
-import com.example.wizzar.ui.theme.TextWhite
-import com.example.wizzar.ui.theme.Typography
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.wizzar.data.dataSource.local.entity.FavoriteLocationEntity
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FavoritesScreen(
+    viewModel: FavoritesViewModel = hiltViewModel(),
+    onNavigateToMap: () -> Unit, // Navigation event to open the Map Screen
+    onNavigateToDetails: (Double, Double) -> Unit // Navigation event to view Weather Details
+) {
+    val favorites by viewModel.favoritesList.collectAsStateWithLifecycle()
+
+    // UI state for showing the 5-second Undo Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Favorite Locations") },
+                actions = {
+                    // The Top-Right button to navigate to the Map Screen
+                    IconButton(onClick = onNavigateToMap) {
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = "Add Favorite"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+
+        if (favorites.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+                Text("No favorites yet. Click the heart icon to add one!", style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // We use the composite key (lat+lon) as the unique 'key' for the LazyColumn items
+                // This prevents UI glitches during swipe-to-delete animations
+                items(
+                    items = favorites,
+                    key = { it.latitude.toString() + it.longitude.toString() }
+                ) { favorite ->
+
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { dismissValue ->
+                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                                // 1. Delete the item
+                                viewModel.removeFavorite(favorite)
+
+                                // 2. Show the Snackbar with an Undo button
+                                coroutineScope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "${favorite.cityName} deleted",
+                                        actionLabel = "Undo",
+                                        duration = SnackbarDuration.Short // Or SnackbarDuration.Long
+                                    )
+                                    // 3. If they clicked Undo, restore the item
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.undoRemoveFavorite(favorite)
+                                    }
+                                }
+                                return@rememberSwipeToDismissBoxState true
+                            }
+                            return@rememberSwipeToDismissBoxState false
+                        }
+                    )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false, // Only allow Right-to-Left swipe
+                        backgroundContent = {
+                            val color by animateColorAsState(
+                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) Color.Red else Color.Transparent
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(color, shape = MaterialTheme.shapes.medium)
+                                    .padding(end = 24.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.White)
+                            }
+                        },
+                        content = {
+                            FavoriteCityCard(
+                                favorite = favorite,
+                                onClick = { onNavigateToDetails(favorite.latitude, favorite.longitude) }
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
-fun FavoritesScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun FavoriteCityCard(
+    favorite: FavoriteLocationEntity,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }, // Navigates to the details screen!
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Text(text = "Favorites Screen", color = TextWhite, style = Typography.headlineMedium)
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = favorite.cityName,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            // You can optionally add a small weather icon or temperature preview here later!
+        }
     }
 }

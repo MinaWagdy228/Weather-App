@@ -12,10 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.wizzar.R
 import com.example.wizzar.ui.theme.PrimaryBlue
 import com.example.wizzar.ui.theme.SkyBase
 import com.example.wizzar.ui.theme.SkyBlueBase
@@ -51,9 +53,17 @@ fun WizzarNavigationBar(navController: NavController, mainViewModel: MainViewMod
         val currentRoute = navBackStackEntry?.destination?.route
 
         items.forEach { screen ->
+            val localizedTitle = when (screen) {
+                ScreenRoutes.Home -> stringResource(R.string.nav_home)
+                ScreenRoutes.Favorites -> stringResource(R.string.nav_favorites)
+                ScreenRoutes.Alerts -> stringResource(R.string.nav_alerts)
+                ScreenRoutes.Settings -> stringResource(R.string.nav_settings)
+                else -> screen.title
+            }
+
             NavigationBarItem(
-                icon = { Icon(imageVector = screen.icon, contentDescription = screen.title) },
-                label = { Text(text = screen.title) },
+                icon = { Icon(imageVector = screen.icon, contentDescription = localizedTitle) },
+                label = { Text(text = localizedTitle) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {

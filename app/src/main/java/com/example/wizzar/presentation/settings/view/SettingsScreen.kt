@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.wizzar.R
@@ -69,7 +70,11 @@ fun SettingsScreen(
 
         SettingsCard(title = stringResource(R.string.temperature_unit)) {
             SegmentedControl(
-                items = listOf(stringResource(R.string.celsius), stringResource(R.string.fahrenheit), stringResource(R.string.kelvin)),
+                items = listOf(
+                    "°C",
+                    "°F",
+                    "°K"
+                ),
                 selectedIndex = when (settingsState.tempUnit) {
                     TempUnit.CELSIUS -> 0
                     TempUnit.FAHRENHEIT -> 1
@@ -88,7 +93,10 @@ fun SettingsScreen(
 
         SettingsCard(title = stringResource(R.string.wind_speed_unit)) {
             SegmentedControl(
-                items = listOf(stringResource(R.string.meters_per_sec), stringResource(R.string.miles_per_hour)),
+                items = listOf(
+                    stringResource(R.string.meters_per_sec),
+                    stringResource(R.string.miles_per_hour)
+                ),
                 selectedIndex = if (settingsState.windUnit == WindUnit.METER_SEC) 0 else 1,
                 onItemSelected = { index ->
                     viewModel.updateWindUnit(if (index == 0) WindUnit.METER_SEC else WindUnit.MILE_HOUR)
@@ -141,7 +149,7 @@ fun SegmentedControl(
             .clip(RoundedCornerShape(12.dp))
             .background(Color.Black.copy(alpha = 0.2f))
             .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items.forEachIndexed { index, text ->
             val isSelected = index == selectedIndex
@@ -151,13 +159,14 @@ fun SegmentedControl(
                     .clip(RoundedCornerShape(10.dp))
                     .background(if (isSelected) PrimaryBlue else Color.Transparent)
                     .clickable { onItemSelected(index) }
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 12.dp, horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = text,
                     color = if (isSelected) TextWhite else TextGray,
-                    style = Typography.labelMedium
+                    style = Typography.labelMedium.copy(fontSize = 11.sp),
+                    maxLines = 1
                 )
             }
         }

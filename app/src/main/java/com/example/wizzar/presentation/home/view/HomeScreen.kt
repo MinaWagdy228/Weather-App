@@ -15,10 +15,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.wizzar.R
 import com.example.wizzar.data.dataSource.local.datastore.TempUnit
 import com.example.wizzar.data.dataSource.local.datastore.WindUnit
 import com.example.wizzar.domain.model.CurrentWeather
@@ -125,8 +127,8 @@ fun HomeScreenContent(
         TempUnit.KELVIN -> "°K"
     }
     val windUnitSymbol = when(windUnit) {
-        WindUnit.METER_SEC -> "m/s"
-        WindUnit.MILE_HOUR -> "mph"
+        WindUnit.METER_SEC -> stringResource(R.string.meters_per_sec)
+        WindUnit.MILE_HOUR -> stringResource(R.string.miles_per_hour)
     }
 
     LazyColumn(

@@ -177,16 +177,22 @@ fun SunriseSunsetCard(modifier: Modifier, sunrise: Long, sunset: Long, sunriseLa
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Icon(imageVector = Icons.Outlined.WbSunny, contentDescription = "Sunrise", tint = WarningYellow)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = sunriseTime, color = TextWhite, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Text(text = sunriseLabel, color = TextGray, style = Typography.labelMedium)
                 }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Icon(imageVector = Icons.Outlined.NightsStay, contentDescription = "Sunset", tint = PurpleAccent)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = sunsetTime, color = TextWhite, fontWeight = FontWeight.Bold, fontSize = 14.sp)

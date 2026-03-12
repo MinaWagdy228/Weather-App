@@ -7,7 +7,8 @@ import com.example.wizzar.data.dataSource.remote.dto.GeocodingDto
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.HourlyForecast
 import com.example.wizzar.domain.model.LocationSearchResult
-
+import com.example.wizzar.data.dataSource.local.entity.AlertEntity
+import com.example.wizzar.domain.model.WeatherAlert
 fun ForecastResponseDto.toCurrentWeatherEntity(requestedLatitude : Double, requestedLongitude : Double): CurrentWeatherEntity {
     val current = list.first()
 
@@ -92,7 +93,7 @@ fun ForecastResponseDto.toEntity(requestedLatitude : Double, requestedLongitude 
     }
 }
 
-fun ForecastEntity.toHourlyForecast(): HourlyForecast {
+fun ForecastEntity.toDomain(): HourlyForecast {
     return HourlyForecast(
         time = timestamp,
         temperature = temperature,
@@ -126,5 +127,23 @@ fun GeocodingDto.toDomain(): LocationSearchResult {
         latitude = lat,
         longitude = lon,
         localizedName = localizedName
+    )
+}
+
+fun AlertEntity.toDomain(): WeatherAlert {
+    return WeatherAlert(
+        id = id,
+        startTime = startTime,
+        endTime = endTime,
+        isAlarmSound = isAlarmSound
+    )
+}
+
+fun WeatherAlert.toEntity(): AlertEntity {
+    return AlertEntity(
+        id = id,
+        startTime = startTime,
+        endTime = endTime,
+        isAlarmSound = isAlarmSound
     )
 }

@@ -1,8 +1,10 @@
 package com.example.wizzar.di
 
+import com.example.wizzar.data.repository.AlertsRepositoryImpl
 import com.example.wizzar.data.repository.FavoritesRepositoryImpl
 import com.example.wizzar.data.repository.SettingsRepositoryImpl
 import com.example.wizzar.data.repository.WeatherRepositoryImpl
+import com.example.wizzar.domain.repository.AlertsRepository
 import com.example.wizzar.domain.repository.FavoritesRepository
 import com.example.wizzar.domain.repository.SettingsRepository
 import com.example.wizzar.domain.repository.WeatherRepository
@@ -34,4 +36,9 @@ abstract class RepositoryModule {
         settingsRepositoryImpl: SettingsRepositoryImpl
     ): SettingsRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindAlertsRepository(
+        alertsRepositoryImpl: AlertsRepositoryImpl
+    ): AlertsRepository
 }

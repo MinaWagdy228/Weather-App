@@ -3,6 +3,7 @@ package com.example.wizzar.di
 import android.content.Context
 import androidx.room.Room
 import com.example.wizzar.data.dataSource.local.LocationProviderImpl
+import com.example.wizzar.data.dataSource.local.dao.AlertDao
 import com.example.wizzar.data.dataSource.local.dao.CurrentWeatherDao
 import com.example.wizzar.data.dataSource.local.dao.FavoriteLocationDao
 import com.example.wizzar.data.dataSource.local.dao.ForecastDao
@@ -70,5 +71,10 @@ object DatabaseModule {
         database: WeatherDatabase
     ): FavoriteLocationDao {
         return database.favoriteLocationDao()
+    }
+
+    @Provides
+    fun provideAlertDao(database: WeatherDatabase): AlertDao {
+        return database.alertDao()
     }
 }

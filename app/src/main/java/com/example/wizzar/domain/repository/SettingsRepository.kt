@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
     fun observeSettings(): Flow<UserSettings>
-
     suspend fun updateLanguage(language: AppLanguage)
     suspend fun updateTempUnit(unit: TempUnit)
     suspend fun updateWindUnit(unit: WindUnit)

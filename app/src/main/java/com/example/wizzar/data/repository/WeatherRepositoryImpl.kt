@@ -8,7 +8,6 @@ import com.example.wizzar.data.dataSource.remote.api.WeatherService
 import com.example.wizzar.data.wrapper.toCurrentWeatherEntity
 import com.example.wizzar.data.wrapper.toDomain
 import com.example.wizzar.data.wrapper.toEntity
-import com.example.wizzar.data.wrapper.toHourlyForecast
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
@@ -32,7 +31,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override fun observeForecast(lat: Double, lon: Double): Flow<List<HourlyForecast>> {
         return forecastDao.observeForecast(lat, lon)
-            .map { list -> list.map { it.toHourlyForecast() } }
+            .map { list -> list.map { it.toDomain() } }
     }
 
     override suspend fun getCachedWeather(lat: Double, lon: Double): WeatherData? {
@@ -41,7 +40,7 @@ class WeatherRepositoryImpl @Inject constructor(
             val currentWeather = entity.toDomain() ?: return null
 
             val forecastEntities = forecastDao.observeForecast(lat, lon).first()
-            val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }
+            val hourlyForecast = forecastEntities.map { it.toDomain() }
 
             val dailyForecast =
                 forecastEntities.groupBy { it.timestamp / 86400 }.map { (_, dayForecasts) ->
@@ -69,7 +68,7 @@ class WeatherRepositoryImpl @Inject constructor(
             ?: throw Exception("Failed to map fresh network data")
 
         val forecastEntities = forecastResponse.toEntity(lat, lon)
-        val hourlyForecast = forecastEntities.map { it.toHourlyForecast() }
+        val hourlyForecast = forecastEntities.map { it.toDomain() }
 
         val dailyForecast =
             forecastEntities.groupBy { it.timestamp / 86400 }.map { (_, dayForecasts) ->

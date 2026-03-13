@@ -18,4 +18,7 @@ interface AlertDao {
     // Exposes a reactive stream for Compose to observe instantly!
     @Query("SELECT * FROM weather_alerts")
     fun observeAllAlerts(): Flow<List<AlertEntity>>
+
+    @Query("SELECT * FROM weather_alerts WHERE id = :id LIMIT 1")
+    suspend fun getAlertById(id: String): AlertEntity?
 }

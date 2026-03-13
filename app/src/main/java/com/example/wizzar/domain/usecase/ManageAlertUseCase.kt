@@ -1,5 +1,7 @@
 package com.example.wizzar.domain.usecase
 
+import com.example.wizzar.di.ExactAlarmScheduler
+import com.example.wizzar.di.WindowNotificationScheduler
 import com.example.wizzar.domain.model.WeatherAlert
 import com.example.wizzar.domain.repository.AlertsRepository
 import com.example.wizzar.domain.scheduler.WeatherAlertScheduler
@@ -8,23 +10,59 @@ import javax.inject.Inject
 
 class ManageAlertsUseCase @Inject constructor(
     private val repository: AlertsRepository,
-    private val scheduler: WeatherAlertScheduler
+    @ExactAlarmScheduler private val exactAlarmScheduler: WeatherAlertScheduler,
+    @WindowNotificationScheduler private val windowNotificationScheduler: WeatherAlertScheduler
 ) {
     fun getAlerts(): Flow<List<WeatherAlert>> {
         return repository.observeAlerts()
     }
 
     suspend fun createAlert(alert: WeatherAlert) {
-        // 1. Save it to the local database so the UI can display it
         repository.saveAlert(alert)
-        // 2. Hand it off to WorkManager to monitor in the background
-        scheduler.schedule(alert)
+
+        // Safety check: Cancel on both systems first in case the user
+        // edited an existing alert and switched its type!
+        exactAlarmScheduler.cancel(alert.id)
+        windowNotificationScheduler.cancel(alert.id)
+
+        // Route to the appropriate execution engine
+        if (alert.isAlarmSound) {
+            exactAlarmScheduler.schedule(alert)
+        } else {
+            windowNotificationScheduler.schedule(alert)
+        }
     }
 
     suspend fun removeAlert(alertId: String) {
-        // 1. Remove from local database
         repository.deleteAlert(alertId)
-        // 2. Cancel the background worker
-        scheduler.cancel(alertId)
+
+        // Blanket cancel to ensure no ghost background tasks remain
+        exactAlarmScheduler.cancel(alertId)
+        windowNotificationScheduler.cancel(alertId)
+    }
+
+    suspend fun getAlert(alertId: String): WeatherAlert? {
+        return repository.getAlertById(alertId)
+    }
+
+    suspend fun snoozeAlert(alertId: String) {
+        val alert = repository.getAlertById(alertId) ?: return
+        val currentTimeMillis = System.currentTimeMillis()
+
+        // Add 10 minutes to the snooze timer
+        val updatedAlert = alert.copy(snoozedUntil = currentTimeMillis + (10 * 60 * 1000))
+
+        // Re-save (which also updates the schedulers via our existing logic)
+        createAlert(updatedAlert)
+    }
+
+    suspend fun dismissAlertForToday(alertId: String) {
+        val alert = repository.getAlertById(alertId) ?: return
+        val currentTimeMillis = System.currentTimeMillis()
+
+        // Stamp today's date so it skips until tomorrow
+        val updatedAlert = alert.copy(lastTriggeredDate = currentTimeMillis)
+
+        createAlert(updatedAlert)
     }
 }

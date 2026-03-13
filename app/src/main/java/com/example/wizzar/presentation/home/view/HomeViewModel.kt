@@ -70,8 +70,8 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
-            val stableLat = targetLat.roundUpToFourDecimals()
-            val stableLon = targetLon.roundUpToFourDecimals()
+            val stableLat = targetLat.roundUpToThreeDecimals()
+            val stableLon = targetLon.roundUpToThreeDecimals()
 
             startObservingWeather(stableLat, stableLon)
 
@@ -121,7 +121,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun Double.roundUpToFourDecimals(): Double {
-        return round(this * 10000) / 10000.0
+    private fun Double.roundUpToThreeDecimals(): Double {
+        return round(this * 1000) / 1000.0
     }
 }

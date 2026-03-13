@@ -26,4 +26,7 @@ class AlertsRepositoryImpl @Inject constructor(
     override suspend fun deleteAlert(id: String) {
         alertDao.deleteAlert(id)
     }
+    override suspend fun getAlertById(id: String): WeatherAlert? {
+        return alertDao.getAlertById(id)?.toDomain()
+    }
 }

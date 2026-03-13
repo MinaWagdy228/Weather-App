@@ -25,7 +25,6 @@ class MapViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // Retrieve the source (settings vs favorites) passed from navigation
     private val source: String = savedStateHandle["source"] ?: "favorites"
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -36,8 +35,8 @@ class MapViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private fun Double.roundUpToFourDecimals(): Double {
-        return round(this * 10000) / 10000.0
+    private fun Double.roundUpToThreeDecimals(): Double {
+        return round(this * 1000) / 1000.0
     }
 
     fun onSearchQueryChanged(query: String) {
@@ -59,8 +58,8 @@ class MapViewModel @Inject constructor(
 
     fun onSearchResultClicked(result: LocationSearchResult) {
         val lockedResult = result.copy(
-            latitude = result.latitude.roundUpToFourDecimals(),
-            longitude = result.longitude.roundUpToFourDecimals()
+            latitude = result.latitude.roundUpToThreeDecimals(),
+            longitude = result.longitude.roundUpToThreeDecimals()
         )
         val nameToDisplay = lockedResult.localizedName ?: lockedResult.name
 
@@ -78,8 +77,8 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val lat = latitude.roundUpToFourDecimals()
-            val lon = longitude.roundUpToFourDecimals()
+            val lat = latitude.roundUpToThreeDecimals()
+            val lon = longitude.roundUpToThreeDecimals()
 
             val cityName = weatherRepository.getCityNameFromCoordinates(lat, lon, currentLanguage)
                 ?: "Selected Location"

@@ -20,38 +20,33 @@ class WorkManagerAlertScheduler @Inject constructor(
     private val workManager = WorkManager.getInstance(context)
 
     override fun schedule(alert: WeatherAlert) {
-        // 1. Package the Domain data into WorkManager Data
+        // We only pass the ID. The Worker will fetch the freshest data from Room.
         val inputData = Data.Builder()
             .putString("ALERT_ID", alert.id)
-            .putLong("START_TIME", alert.startTime)
-            .putLong("END_TIME", alert.endTime)
-            .putBoolean("IS_ALARM", alert.isAlarmSound)
             .build()
 
-        // 2. Set constraints (we only want to check weather if we have internet)
+        // Constraints: Only run if we have an active internet connection
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        // 3. Build the periodic request (minimum interval is 15 minutes)
         val workRequest = PeriodicWorkRequestBuilder<WeatherAlertWorker>(
-            15, TimeUnit.MINUTES
+            30, TimeUnit.MINUTES,
+            5, TimeUnit.MINUTES
         )
             .setInputData(inputData)
             .setConstraints(constraints)
-            .addTag(alert.id) // Crucial: We tag it with the ID so we can find/cancel it later
+            .addTag(alert.id)
             .build()
 
-        // 4. Enqueue unique work to avoid duplicates if the user edits the alert
         workManager.enqueueUniquePeriodicWork(
-            alert.id,
-            ExistingPeriodicWorkPolicy.UPDATE, // Updates the existing work if ID matches
+            alert.id, // Unique name
+            ExistingPeriodicWorkPolicy.UPDATE, // Update if the user changes settings
             workRequest
         )
     }
 
     override fun cancel(alertId: String) {
-        // WorkManager makes cancellation trivial if we tagged the work properly
         workManager.cancelUniqueWork(alertId)
     }
 }

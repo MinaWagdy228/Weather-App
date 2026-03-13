@@ -9,7 +9,11 @@ import com.example.wizzar.domain.model.HourlyForecast
 import com.example.wizzar.domain.model.LocationSearchResult
 import com.example.wizzar.data.dataSource.local.entity.AlertEntity
 import com.example.wizzar.domain.model.WeatherAlert
-fun ForecastResponseDto.toCurrentWeatherEntity(requestedLatitude : Double, requestedLongitude : Double): CurrentWeatherEntity {
+
+fun ForecastResponseDto.toCurrentWeatherEntity(
+    requestedLatitude: Double,
+    requestedLongitude: Double
+): CurrentWeatherEntity {
     val current = list.first()
 
     return CurrentWeatherEntity(
@@ -76,7 +80,10 @@ fun CurrentWeather.toEntity(): CurrentWeatherEntity {
     )
 }
 
-fun ForecastResponseDto.toEntity(requestedLatitude : Double, requestedLongitude : Double): List<ForecastEntity> {
+fun ForecastResponseDto.toEntity(
+    requestedLatitude: Double,
+    requestedLongitude: Double
+): List<ForecastEntity> {
     val cityName = city
 
     return list.map {
@@ -105,7 +112,7 @@ fun ForecastEntity.toDomain(): HourlyForecast {
 }
 
 // Reverse mapper: HourlyForecast to Entity
-fun HourlyForecast.toEntity(cityName: String, latitude : Double, longitude: Double): ForecastEntity {
+fun HourlyForecast.toEntity(cityName: String, latitude: Double, longitude: Double): ForecastEntity {
     return ForecastEntity(
         cityName = cityName,
         timestamp = time,
@@ -135,7 +142,13 @@ fun AlertEntity.toDomain(): WeatherAlert {
         id = id,
         startTime = startTime,
         endTime = endTime,
-        isAlarmSound = isAlarmSound
+        isAlarmSound = isAlarmSound,
+        latitude = latitude,
+        longitude = longitude,
+        cityName = cityName,
+        isActive = isActive,
+        snoozedUntil = snoozedUntil,
+        lastTriggeredDate = lastTriggeredDate
     )
 }
 
@@ -144,6 +157,12 @@ fun WeatherAlert.toEntity(): AlertEntity {
         id = id,
         startTime = startTime,
         endTime = endTime,
-        isAlarmSound = isAlarmSound
+        isAlarmSound = isAlarmSound,
+        latitude = latitude,
+        longitude = longitude,
+        cityName = cityName,
+        isActive = isActive,
+        snoozedUntil = snoozedUntil,
+        lastTriggeredDate = lastTriggeredDate
     )
 }

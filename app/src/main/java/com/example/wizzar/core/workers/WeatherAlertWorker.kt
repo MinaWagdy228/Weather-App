@@ -6,81 +6,93 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.ListenableWorker.Result as WorkResult
-import com.example.wizzar.domain.location.LocationProvider
+import com.example.wizzar.core.notifications.WeatherNotificationManager
+import com.example.wizzar.domain.repository.AlertsRepository
 import com.example.wizzar.domain.usecase.WeatherUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 @HiltWorker
 class WeatherAlertWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted private val workerParams: WorkerParameters,
     private val weatherUseCase: WeatherUseCase,
-    private val locationProvider: LocationProvider
+    private val alertsRepository: AlertsRepository,
+    private val notificationManager: WeatherNotificationManager
 ) : CoroutineWorker(appContext, workerParams) {
 
-    override suspend fun doWork(): WorkResult {
-        // 1. Extract the data we packed in WorkManagerAlertScheduler
-        val alertId = inputData.getString("ALERT_ID") ?: return WorkResult.failure()
-        val startTime = inputData.getLong("START_TIME", 0L)
-        val endTime = inputData.getLong("END_TIME", 0L)
-        val isAlarm = inputData.getBoolean("IS_ALARM", false)
+    override suspend fun doWork(): WorkResult = withContext(Dispatchers.IO) {
+        val alertId = inputData.getString("ALERT_ID") ?: return@withContext WorkResult.failure()
 
-        val currentTime = System.currentTimeMillis()
+        // 1. Fetch freshest state from the Single Source of Truth
+        val alert = alertsRepository.getAlertById(alertId) ?: return@withContext WorkResult.success()
 
-        // 2. Enforce the user's active duration bounds
-        if (currentTime < startTime) {
-            return WorkResult.success() // Too early, sleep until next periodic execution
-        }
-        if (currentTime > endTime) {
-            // It is past the active duration. We return success to finish this cycle.
-            // (In a complete implementation, we'd also trigger a cancellation here)
-            return WorkResult.success()
+        // 2. Hybrid Safety Check: If off, or if it's a Loud Alarm, ignore!
+        if (!alert.isActive || alert.isAlarmSound) {
+            return@withContext WorkResult.success()
         }
 
-        // 3. Get the user's current location to check the weather
-        val location = locationProvider.getCurrentLocation()
-        if (!location.isValid()) {
-            return WorkResult.retry() // Retry later if we can't get a GPS fix
+        val now = Calendar.getInstance()
+        val currentMinutesSinceMidnight = (now.get(Calendar.HOUR_OF_DAY) * 60) + now.get(Calendar.MINUTE)
+        val currentTimeMillis = System.currentTimeMillis()
+
+        // 3. "Once a Day" Check
+        if (alert.lastTriggeredDate != null) {
+            val lastTriggerCal = Calendar.getInstance().apply { timeInMillis = alert.lastTriggeredDate }
+            if (lastTriggerCal.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR) &&
+                lastTriggerCal.get(Calendar.YEAR) == now.get(Calendar.YEAR)) {
+                return@withContext WorkResult.success() // Already notified today
+            }
         }
 
-        // 4. Fetch fresh weather data from the Domain layer
-        // We use fully qualified name for your Domain Result to avoid clashing with WorkResult
+        // 4. Active Window Check (Handles the 11 PM to 2 AM edge case)
+        val isWithinTimeframe = if (alert.startTime <= alert.endTime) {
+            currentMinutesSinceMidnight in alert.startTime..alert.endTime
+        } else {
+            currentMinutesSinceMidnight >= alert.startTime || currentMinutesSinceMidnight <= alert.endTime
+        }
+
+        if (!isWithinTimeframe) {
+            return@withContext WorkResult.success() // Outside the window, go back to sleep
+        }
+
+        // 5. Fetch Weather
         val weatherResult = weatherUseCase.refreshWeather(
-            latitude = location.latitude,
-            longitude = location.longitude,
+            latitude = alert.latitude,
+            longitude = alert.longitude,
             forceRefresh = true
         )
 
         if (weatherResult is com.example.wizzar.domain.model.Result.Success) {
             val weather = weatherResult.data.currentWeather
-
-            // 5. Evaluate Alert Conditions
-            // OpenWeatherMap condition codes: 5xx is Rain, 6xx is Snow, 7xx is Fog/Atmosphere
             val conditionId = weather.weatherConditionId
-            val isRain = conditionId in 500..531
-            val isSnow = conditionId in 600..622
-            val isFog = conditionId == 741
 
-            // Assuming temperature is handled by your UnitConverter, we check raw values here
-            // (You might want to refine these thresholds based on the user's selected units later)
-            val isExtremeTemp = weather.temperature > 40.0 || weather.temperature < 0.0
-            val isHighWind = weather.wind > 15.0 // e.g., > 15 m/s
+            val isBadWeather = (conditionId in 500..531) || // Rain
+                    (conditionId in 600..622) || // Snow
+                    (conditionId == 741) ||      // Fog
+                    (weather.temperature > 40.0 || weather.temperature < 0.0) ||
+                    (weather.wind > 15.0)
 
-            if (isRain || isSnow || isFog || isExtremeTemp || isHighWind) {
-                triggerAlert(weather.description, isAlarm)
+            if (isBadWeather) {
+                val description = "⚠️ SEVERE WEATHER: ${weather.description}. Check the app for details."
+
+                notificationManager.showStandardNotification(
+                    alertId = alert.id,
+                    cityName = alert.cityName,
+                    weatherDescription = description
+                )
+
+                // Save state so we don't spam them again today
+                alertsRepository.saveAlert(alert.copy(lastTriggeredDate = currentTimeMillis))
             }
 
-            return WorkResult.success()
+            return@withContext WorkResult.success()
         } else {
-            // If the network fails, we tell WorkManager to back off and retry later
-            return WorkResult.retry()
+            // Network failed, ask WorkManager to retry later
+            return@withContext WorkResult.retry()
         }
-    }
-
-    private fun triggerAlert(description: String, isAlarm: Boolean) {
-        // We will implement the actual Notification/Alarm Service next.
-        // For now, we log it to prove our architecture pipeline works!
-        Log.d("WeatherAlertWorker", "ALERT TRIGGERED: $description | Alarm Sound: $isAlarm")
     }
 }

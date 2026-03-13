@@ -1,5 +1,6 @@
 package com.example.wizzar.di
 
+import com.example.wizzar.core.receivers.AndroidAlarmScheduler
 import com.example.wizzar.core.workers.WorkManagerAlertScheduler
 import com.example.wizzar.domain.scheduler.WeatherAlertScheduler
 import dagger.Binds
@@ -14,7 +15,15 @@ abstract class SchedulerModule {
 
     @Binds
     @Singleton
-    abstract fun bindWeatherAlertScheduler(
+    @ExactAlarmScheduler // 👈 Maps to AlarmManager
+    abstract fun bindExactAlarmScheduler(
+        androidAlarmScheduler: AndroidAlarmScheduler
+    ): WeatherAlertScheduler
+
+    @Binds
+    @Singleton
+    @WindowNotificationScheduler // 👈 Maps to WorkManager
+    abstract fun bindWindowNotificationScheduler(
         workManagerAlertScheduler: WorkManagerAlertScheduler
     ): WeatherAlertScheduler
 }

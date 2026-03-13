@@ -24,14 +24,12 @@ class FavoritesViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    // 2. ACTION: Delete a city (Triggered by Swipe)
     fun removeFavorite(favorite: FavoriteLocationEntity) {
         viewModelScope.launch {
             manageFavoritesUseCase.removeFavorite(favorite.latitude, favorite.longitude)
         }
     }
 
-    // 3. ACTION: Undo Delete (Triggered by Snackbar)
     fun undoRemoveFavorite(favorite: FavoriteLocationEntity) {
         viewModelScope.launch {
             manageFavoritesUseCase.addFavoriteLocation(

@@ -78,8 +78,6 @@ fun FavoritesScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // We use the composite key (lat+lon) as the unique 'key' for the LazyColumn items
-                // This prevents UI glitches during swipe-to-delete animations
                 items(
                     items = favorites,
                     key = { it.latitude.toString() + it.longitude.toString() }
@@ -88,17 +86,15 @@ fun FavoritesScreen(
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { dismissValue ->
                             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                                // 1. Delete the item
                                 viewModel.removeFavorite(favorite)
 
-                                // 2. Show the Snackbar with an Undo button
                                 coroutineScope.launch {
                                     val result = snackbarHostState.showSnackbar(
                                         message = context.getString(R.string.item_deleted, favorite.cityName),
                                         actionLabel = context.getString(R.string.undo),
-                                        duration = SnackbarDuration.Short // Or SnackbarDuration.Long
+                                        duration = SnackbarDuration.Short
                                     )
-                                    // 3. If they clicked Undo, restore the item
+                                    // If they clicked Undo, restore the item
                                     if (result == SnackbarResult.ActionPerformed) {
                                         viewModel.undoRemoveFavorite(favorite)
                                     }
@@ -111,7 +107,7 @@ fun FavoritesScreen(
 
                     SwipeToDismissBox(
                         state = dismissState,
-                        enableDismissFromStartToEnd = false, // Only allow Right-to-Left swipe
+                        enableDismissFromStartToEnd = false,
                         backgroundContent = {
                             val color by animateColorAsState(
                                 targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) Color.Red else Color.Transparent
@@ -177,7 +173,6 @@ fun FavoriteCityCard(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = stringResource(R.string.check_details_desc),
             )
-            // You can optionally add a small weather icon or temperature preview here later!
         }
     }
 }

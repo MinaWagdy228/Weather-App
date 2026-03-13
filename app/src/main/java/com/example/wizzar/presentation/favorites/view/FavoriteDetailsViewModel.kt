@@ -26,7 +26,6 @@ class FavoriteDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // Retrieve the coordinates passed from the NavGraph
     private val lat: Double = savedStateHandle.get<Float>("lat")?.toDouble() ?: 0.0
     private val lon: Double = savedStateHandle.get<Float>("lon")?.toDouble() ?: 0.0
 

@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.math.RoundingMode
 import javax.inject.Inject
 import kotlin.math.round
 
@@ -32,9 +30,8 @@ class MainViewModel @Inject constructor(
             val loc = locationProvider.getCurrentLocation()
 
             if (loc.isValid()) {
-                // 👈 THE FIX: Apply the exact same lock!
-                val stableLat = loc.latitude.roundUpToFourDecimals().toDouble()
-                val stableLon = loc.longitude.roundUpToFourDecimals().toDouble()
+                val stableLat = loc.latitude.roundUpToThreeDecimals()
+                val stableLon = loc.longitude.roundUpToThreeDecimals()
 
                 weatherUseCase.observeWeather(stableLat, stableLon).collect { weatherData ->
                     if (weatherData?.currentWeather != null) {
@@ -50,7 +47,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun Double.roundUpToFourDecimals(): Double {
-        return round(this * 10000) / 10000.0
+    fun Double.roundUpToThreeDecimals(): Double {
+        return round(this * 1000) / 1000.0
     }
 }

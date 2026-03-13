@@ -27,7 +27,7 @@ class WeatherNotificationManager @Inject constructor(
 
         // 2. Build the notification
         val notification = NotificationCompat.Builder(context, "weather_notification_channel")
-            .setSmallIcon(R.mipmap.ic_launcher) // TODO: Replace with a monochrome weather icon
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("Weather Alert: $cityName")
             .setContentText("Current condition: $weatherDescription. Tap to view details.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

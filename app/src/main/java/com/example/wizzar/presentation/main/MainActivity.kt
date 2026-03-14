@@ -1,0 +1,55 @@
+package com.example.wizzar.presentation.main
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
+import com.example.wizzar.presentation.common.StarryBackground
+import com.example.wizzar.presentation.common.SunnyBackground
+import com.example.wizzar.presentation.navigation.MainViewModel
+import com.example.wizzar.presentation.navigation.NavGraph
+import com.example.wizzar.presentation.navigation.WizzarNavigationBar
+import com.example.wizzar.ui.theme.WizzarTheme
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val navController = rememberNavController()
+            val mainViewModel: MainViewModel = hiltViewModel()
+            val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
+
+            WizzarTheme(isDaytime = isDaytime) {
+                Box(modifier = Modifier.Companion.fillMaxSize()) {
+                    if (isDaytime) {
+                        SunnyBackground()
+                    } else {
+                        StarryBackground()
+                    }
+                    Scaffold(
+                        bottomBar = {
+                            WizzarNavigationBar(
+                                navController = navController,
+                                mainViewModel = mainViewModel
+                            )
+                        },
+                        containerColor = Color.Companion.Transparent
+                    ) { innerPadding ->
+                        NavGraph(navController = navController, paddingValues = innerPadding)
+                    }
+                }
+            }
+        }
+    }
+}

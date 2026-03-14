@@ -1,0 +1,85 @@
+<resources>
+    <string name="app_name">ويزار</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_favorites">المفضلة</string>
+    <string name="nav_alerts">تنبيهات</string>
+    <string name="nav_settings">الاعدادات</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الاعدادات</string>
+    <string name="location_source">مصدر الموقع</string>
+    <string name="gps">GPS</string>
+    <string name="map_pin">الخريطة</string>
+    <string name="temperature_unit">وحدة الحرارة</string>
+    <string name="celsius">سيليزية</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="kelvin">كلفن</string>
+    <string name="wind_speed_unit">وحدة سرعة الرياح</string>
+    <string name="meters_per_sec">متر/ثانية</string>
+    <string name="miles_per_hour">ميل/ساعة</string>
+    <string name="api_language">لغة البيانات</string>
+    <string name="english">الانجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="lang_english">الانجليزية</string>
+    <string name="lang_arabic">العربية</string>
+
+    <!-- Home -->
+    <string name="feels_like_high_low">يشعر كأنها %1$s · العظمى %2$s · الصغرى %3$s</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="wind_speed">الرياح</string>
+    <string name="pressure">الضغط</string>
+    <string name="sunrise">الشروق</string>
+    <string name="sunset">الغروب</string>
+    <string name="todays_forecast">توقعات اليوم</string>
+    <string name="five_day_forecast">توقعات 5 أيام</string>
+    <string name="permission_location_needed">مطلوب إذن الموقع للطقس المحلي.</string>
+    <string name="location_error_gps">تعذر تحديد الموقع. تأكد من تفعيل GPS.</string>
+    <string name="loading">جار التحميل...</string>
+
+    <!-- Favorites -->
+    <string name="favorite_locations_title">المواقع المفضلة</string>
+    <string name="add_favorite_desc">إضافة مفضلة</string>
+    <string name="no_favorites_yet">لا توجد مفضلات. اضغط على القلب لإضافة واحد!</string>
+    <string name="item_deleted">تم حذف %1$s</string>
+    <string name="undo">تراجع</string>
+    <string name="delete_desc">حذف</string>
+    <string name="favorited_city_desc">مدينة مفضلة</string>
+    <string name="check_details_desc">عرض تفاصيل الطقس</string>
+    <string name="city_weather_title">طقس المدينة</string>
+    <string name="navigate_back_desc">الرجوع</string>
+
+    <!-- Map -->
+    <string name="search_hint">ابحث عن مدينة...</string>
+    <string name="search_desc">بحث</string>
+    <string name="select_location_btn">اختيار %1$s</string>
+
+    <!-- Alerts -->
+    <string name="alerts_screen_title">شاشة التنبيهات</string>
+    <string name="weather_alerts_title">تنبيهات الطقس</string>
+    <string name="add_alert_desc">إضافة تنبيه</string>
+    <string name="permission_notification_needed">مطلوب إذن الإشعارات لتلقي تنبيهات الطقس.</string>
+    <string name="grant">منح</string>
+    <string name="no_alarms_set">لم يتم تعيين أي منبهات بعد.</string>
+    <string name="alarm_deleted">تم حذف التنبيه لمدينة %1$s</string>
+    <string name="end_time_error">وقت الانتهاء يجب أن يكون بعد وقت البدء!</string>
+    <string name="start_duration">وقت البدء</string>
+    <string name="end_duration">وقت الانتهاء</string>
+    <string name="notify_me_by">نبهني بواسطة</string>
+    <string name="alarm">منبه</string>
+    <string name="notification">إشعار</string>
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="select_time">اختر الوقت</string>
+    <string name="time_am">ص</string>
+    <string name="time_pm">م</string>
+
+    <string name="ensure_gps_enabled">تعذر تحديد الموقع الحالي. تأكد من تفعيل GPS.</string>
+    <string name="selected_location_default">الموقع المحدد</string>
+    <string name="alarm_less_than_minute">تم ضبط التنبيه لأقل من دقيقة من الآن.</string>
+    <string name="alarm_set_for">تم ضبط التنبيه بعد %1$d ساعة و %2$d دقيقة من الآن.</string>
+
+    <!-- Temporary / Error -->
+    <string name="unknown_error">خطأ غير معروف</string>
+</resources>

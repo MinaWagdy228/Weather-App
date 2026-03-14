@@ -1,3 +1,85 @@
 <resources>
     <string name="app_name">Wizzar</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_alerts">Alerts</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="location_source">Location Source</string>
+    <string name="gps">GPS</string>
+    <string name="map_pin">Map Pin</string>
+    <string name="temperature_unit">Temperature Unit</string>
+    <string name="celsius">Celsius</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="kelvin">Kelvin</string>
+    <string name="wind_speed_unit">Wind Speed Unit</string>
+    <string name="meters_per_sec">m/s</string>
+    <string name="miles_per_hour">mph</string>
+    <string name="api_language">API Language</string>
+    <string name="english">English</string>
+    <string name="arabic">Arabic</string>
+    <string name="lang_english">English</string>
+    <string name="lang_arabic">Arabic</string>
+
+    <!-- Home -->
+    <string name="feels_like_high_low">Feels like %1$s · High %2$s · Low %3$s</string>
+    <string name="humidity">HUMIDITY</string>
+    <string name="wind_speed">WIND SPEED</string>
+    <string name="pressure">PRESSURE</string>
+    <string name="sunrise">SUNRISE</string>
+    <string name="sunset">SUNSET</string>
+    <string name="todays_forecast">Today\'s Forecast</string>
+    <string name="five_day_forecast">5-Day Forecast</string>
+    <string name="permission_location_needed">Location permission is needed for local weather.</string>
+    <string name="location_error_gps">Could not determine current location. Ensure GPS is enabled.</string>
+    <string name="loading">Loading...</string>
+
+    <!-- Favorites -->
+    <string name="favorite_locations_title">Favorite Locations</string>
+    <string name="add_favorite_desc">Add Favorite</string>
+    <string name="no_favorites_yet">No favorites yet. Click the heart icon to add one!</string>
+    <string name="item_deleted">%1$s deleted</string>
+    <string name="undo">Undo</string>
+    <string name="delete_desc">Delete</string>
+    <string name="favorited_city_desc">a Favorited City</string>
+    <string name="check_details_desc">Check City\'s weather details</string>
+    <string name="city_weather_title">City Weather</string>
+    <string name="navigate_back_desc">Navigate Back</string>
+
+    <!-- Map -->
+    <string name="search_hint">Search for a city...</string>
+    <string name="search_desc">Search</string>
+    <string name="select_location_btn">Select %1$s</string>
+
+    <!-- Alerts -->
+    <string name="alerts_screen_title">Alerts Screen</string>
+    <string name="weather_alerts_title">Weather Alerts</string>
+    <string name="add_alert_desc">Add Alert</string>
+    <string name="permission_notification_needed">Notification permission is needed to receive weather alerts.</string>
+    <string name="grant">Grant</string>
+    <string name="no_alarms_set">You haven\'t set any alarms yet.</string>
+    <string name="alarm_deleted">Alarm for %1$s deleted</string>
+    <string name="end_time_error">End time must be after Start time!</string>
+    <string name="start_duration">Start Duration</string>
+    <string name="end_duration">End Duration</string>
+    <string name="notify_me_by">Notify me by</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="cancel">CANCEL</string>
+    <string name="save">SAVE</string>
+    <string name="select_time">Select Time</string>
+    <string name="time_am">AM</string>
+    <string name="time_pm">PM</string>
+
+    <string name="ensure_gps_enabled">Could not determine current location. Ensure GPS is enabled.</string>
+    <string name="selected_location_default">Selected Location</string>
+    <string name="alarm_less_than_minute">Alarm set for less than a minute from now.</string>
+    <string name="alarm_set_for">Alarm set for %1$d hours and %2$d minutes from now.</string>
+
+    <!-- Temporary / Error -->
+    <string name="unknown_error">Unknown error</string>
 </resources>

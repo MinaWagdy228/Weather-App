@@ -125,7 +125,6 @@ fun FavoritesScreen(
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = stringResource(R.string.delete_desc),
-                                    tint = Color.White
                                 )
                             }
                         },
@@ -156,7 +155,7 @@ fun FavoriteCityCard(
         modifier = Modifier.glassmorphic(RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        onClick = onClick, // Navigates to the details screen!
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.padding(20.dp),

@@ -51,6 +51,16 @@ android {
         compose = true
         buildConfig = true
     }
+    packaging {
+        resources {
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+        }
+    }
 }
 
 dependencies {
@@ -65,6 +75,10 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.hilt.work)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -121,6 +135,7 @@ dependencies {
 
         // Turbine: The absolute best library for testing Kotlin Flows
         testImplementation("app.cash.turbine:turbine:1.1.0")
+        androidTestImplementation("app.cash.turbine:turbine:1.1.0")
 
         // Architecture Components Core Testing (InstantTaskExecutorRule)
         testImplementation("androidx.arch.core:core-testing:2.2.0")
@@ -131,5 +146,6 @@ dependencies {
         // Google Truth: For very readable assertions (e.g., assertThat(x).isEqualTo(y))
         testImplementation("com.google.truth:truth:1.4.2")
         androidTestImplementation("com.google.truth:truth:1.4.2")
+        testImplementation(kotlin("test"))
 
 }

@@ -8,7 +8,8 @@ import com.example.wizzar.core.notifications.WeatherNotificationManager
 import com.example.wizzar.di.ExactAlarmScheduler
 import com.example.wizzar.domain.repository.AlertsRepository
 import com.example.wizzar.domain.scheduler.WeatherAlertScheduler
-import com.example.wizzar.domain.usecase.WeatherUseCase
+import com.example.wizzar.domain.usecase.GetWeatherUseCase
+import com.example.wizzar.domain.util.Result
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class WeatherAlarmReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var weatherUseCase: WeatherUseCase
+    @Inject lateinit var getWeatherUseCase: GetWeatherUseCase
     @Inject lateinit var alertsRepository: AlertsRepository
     @Inject lateinit var notificationManager: WeatherNotificationManager
 
@@ -39,7 +40,7 @@ class WeatherAlarmReceiver : BroadcastReceiver() {
 
                 if (!alert.isAlarmSound) return@launch
 
-                val weatherResult = weatherUseCase.refreshWeather(
+                val weatherResult = getWeatherUseCase.refreshWeather(
                     latitude = alert.latitude,
                     longitude = alert.longitude,
                     forceRefresh = true
@@ -48,7 +49,7 @@ class WeatherAlarmReceiver : BroadcastReceiver() {
                 var finalDescription = "Unable to fetch current weather data."
 
                 // 3. Evaluate Good vs Bad Weather unconditionally
-                if (weatherResult is com.example.wizzar.domain.model.Result.Success) {
+                if (weatherResult is Result.Success) {
                     val weather = weatherResult.data.currentWeather
                     val conditionId = weather.weatherConditionId
 

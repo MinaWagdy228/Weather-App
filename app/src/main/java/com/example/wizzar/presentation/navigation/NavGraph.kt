@@ -9,12 +9,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.wizzar.presentation.alerts.view.AlertsScreen
-import com.example.wizzar.presentation.favorites.view.FavoriteDetailsScreen
-import com.example.wizzar.presentation.favorites.view.FavoritesScreen
-import com.example.wizzar.presentation.home.view.HomeScreen
+import com.example.wizzar.presentation.alerts.AlertsScreen
+import com.example.wizzar.presentation.favorites.FavoriteDetailsScreen
+import com.example.wizzar.presentation.favorites.FavoritesScreen
+import com.example.wizzar.presentation.home.HomeScreen
 import com.example.wizzar.presentation.map.MapScreen
-import com.example.wizzar.presentation.settings.view.SettingsScreen
+import com.example.wizzar.presentation.settings.SettingsScreen
 
 @Composable
 fun NavGraph(

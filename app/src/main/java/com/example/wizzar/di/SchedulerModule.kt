@@ -1,7 +1,7 @@
 package com.example.wizzar.di
 
-import com.example.wizzar.core.receivers.AndroidAlarmScheduler
-import com.example.wizzar.core.workers.WorkManagerAlertScheduler
+import com.example.wizzar.core.sheduler.AndroidAlarmScheduler
+import com.example.wizzar.core.sheduler.WorkManagerAlertScheduler
 import com.example.wizzar.domain.scheduler.WeatherAlertScheduler
 import dagger.Binds
 import dagger.Module

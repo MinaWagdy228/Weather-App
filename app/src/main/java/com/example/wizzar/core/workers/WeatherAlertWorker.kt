@@ -1,14 +1,13 @@
 package com.example.wizzar.core.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.ListenableWorker.Result as WorkResult
 import com.example.wizzar.core.notifications.WeatherNotificationManager
 import com.example.wizzar.domain.repository.AlertsRepository
-import com.example.wizzar.domain.usecase.WeatherUseCase
+import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,7 @@ import java.util.Calendar
 class WeatherAlertWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted private val workerParams: WorkerParameters,
-    private val weatherUseCase: WeatherUseCase,
+    private val getWeatherUseCase: GetWeatherUseCase,
     private val alertsRepository: AlertsRepository,
     private val notificationManager: WeatherNotificationManager
 ) : CoroutineWorker(appContext, workerParams) {
@@ -60,13 +59,13 @@ class WeatherAlertWorker @AssistedInject constructor(
         }
 
         // 5. Fetch Weather
-        val weatherResult = weatherUseCase.refreshWeather(
+        val weatherResult = getWeatherUseCase.refreshWeather(
             latitude = alert.latitude,
             longitude = alert.longitude,
             forceRefresh = true
         )
 
-        if (weatherResult is com.example.wizzar.domain.model.Result.Success) {
+        if (weatherResult is com.example.wizzar.domain.util.Result.Success) {
             val weather = weatherResult.data.currentWeather
             val conditionId = weather.weatherConditionId
 
@@ -76,7 +75,7 @@ class WeatherAlertWorker @AssistedInject constructor(
                     (weather.temperature > 40.0 || weather.temperature < 0.0) ||
                     (weather.wind > 15.0)
 
-            if (isBadWeather) {
+            if (true) {
                 val description = "⚠️ SEVERE WEATHER: ${weather.description}. Check the app for details."
 
                 notificationManager.showStandardNotification(

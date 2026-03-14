@@ -3,7 +3,7 @@ package com.example.wizzar.presentation.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wizzar.domain.location.LocationProvider
-import com.example.wizzar.domain.usecase.WeatherUseCase
+import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import kotlin.math.round
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val weatherUseCase: WeatherUseCase,
+    private val getWeatherUseCase: GetWeatherUseCase,
     private val locationProvider: LocationProvider
 ) : ViewModel() {
 
@@ -33,7 +33,7 @@ class MainViewModel @Inject constructor(
                 val stableLat = loc.latitude.roundUpToThreeDecimals()
                 val stableLon = loc.longitude.roundUpToThreeDecimals()
 
-                weatherUseCase.observeWeather(stableLat, stableLon).collect { weatherData ->
+                getWeatherUseCase.observeWeather(stableLat, stableLon).collect { weatherData ->
                     if (weatherData?.currentWeather != null) {
                         val currentTime = System.currentTimeMillis() / 1000
                         val sunrise = weatherData.currentWeather.sunrise

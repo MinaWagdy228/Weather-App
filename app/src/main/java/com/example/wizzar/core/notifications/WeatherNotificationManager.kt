@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.wizzar.R
-import com.example.wizzar.presentation.alerts.view.WeatherAlarmActivity
+import com.example.wizzar.presentation.alerts.WeatherAlarmActivity
 import com.example.wizzar.presentation.main.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

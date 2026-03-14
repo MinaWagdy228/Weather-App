@@ -2,7 +2,7 @@ package com.example.wizzar.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.wizzar.data.dataSource.local.LocationProviderImpl
+import com.example.wizzar.data.location.LocationProviderImpl
 import com.example.wizzar.data.dataSource.local.dao.AlertDao
 import com.example.wizzar.data.dataSource.local.dao.CurrentWeatherDao
 import com.example.wizzar.data.dataSource.local.dao.FavoriteLocationDao

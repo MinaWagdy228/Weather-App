@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.alerts.view.WeatherAlarmActivity"
+            android:name=".presentation.alerts.WeatherAlarmActivity"
             android:exported="false"
             android:showOnLockScreen="true"
             android:turnScreenOn="true"

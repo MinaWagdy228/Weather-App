@@ -2,12 +2,11 @@ package com.example.wizzar.data.repository
 
 import android.util.Log
 import com.example.wizzar.BuildConfig.API_KEY
-import com.example.wizzar.data.dataSource.local.dao.CurrentWeatherDao
-import com.example.wizzar.data.dataSource.local.dao.ForecastDao
-import com.example.wizzar.data.dataSource.remote.api.WeatherService
-import com.example.wizzar.data.wrapper.toCurrentWeatherEntity
-import com.example.wizzar.data.wrapper.toDomain
-import com.example.wizzar.data.wrapper.toEntity
+import com.example.wizzar.data.dataSource.local.WeatherLocalDataSource
+import com.example.wizzar.data.dataSource.remote.WeatherRemoteDataSource
+import com.example.wizzar.data.mapper.toCurrentWeatherEntity
+import com.example.wizzar.data.mapper.toDomain
+import com.example.wizzar.data.mapper.toEntity
 import com.example.wizzar.domain.model.CurrentWeather
 import com.example.wizzar.domain.model.DailyForecast
 import com.example.wizzar.domain.model.HourlyForecast
@@ -20,26 +19,25 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
-    private val weatherService: WeatherService,
-    private val currentWeatherDao: CurrentWeatherDao,
-    private val forecastDao: ForecastDao
+    private val remoteDataSource: WeatherRemoteDataSource,
+    private val localDataSource: WeatherLocalDataSource
 ) : WeatherRepository {
 
     override fun observeCurrentWeather(lat: Double, lon: Double): Flow<CurrentWeather?> {
-        return currentWeatherDao.observeCurrentWeather(lat, lon).map { it?.toDomain() }
+        return localDataSource.observeCurrentWeather(lat, lon).map { it?.toDomain() }
     }
 
     override fun observeForecast(lat: Double, lon: Double): Flow<List<HourlyForecast>> {
-        return forecastDao.observeForecast(lat, lon)
+        return localDataSource.observeForecast(lat, lon)
             .map { list -> list.map { it.toDomain() } }
     }
 
     override suspend fun getCachedWeather(lat: Double, lon: Double): WeatherData? {
         return try {
-            val entity = currentWeatherDao.observeCurrentWeather(lat, lon).first() ?: return null
+            val entity = localDataSource.observeCurrentWeather(lat, lon).first() ?: return null
             val currentWeather = entity.toDomain() ?: return null
 
-            val forecastEntities = forecastDao.observeForecast(lat, lon).first()
+            val forecastEntities = localDataSource.observeForecast(lat, lon).first()
             val hourlyForecast = forecastEntities.map { it.toDomain() }
 
             val dailyForecast =
@@ -61,7 +59,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override suspend fun fetchWeatherFromApi(lat: Double, lon: Double, lang: String): WeatherData {
         val forecastResponse =
-            weatherService.getForecast(lat = lat, lon = lon, apiKey = API_KEY, lang = lang)
+            remoteDataSource.getForecast(lat = lat, lon = lon, apiKey = API_KEY, lang = lang)
 
         // Maps using exact GPS coordinates to override API shifts
         val currentWeather = forecastResponse.toCurrentWeatherEntity(lat, lon).toDomain()
@@ -83,10 +81,10 @@ class WeatherRepositoryImpl @Inject constructor(
 
         return WeatherData(currentWeather, hourlyForecast, dailyForecast)
     }
-    // NEW: Auto-Complete Search Implementation
+
     override suspend fun searchLocations(query: String): List<LocationSearchResult> {
         return try {
-            val dtoList = weatherService.searchCityByName(query = query, apiKey = API_KEY)
+            val dtoList = remoteDataSource.searchCityByName(query = query, apiKey = API_KEY)
             dtoList.map {
                 it.toDomain()
             }
@@ -95,14 +93,13 @@ class WeatherRepositoryImpl @Inject constructor(
         }
     }
 
-    // NEW: Map Pin Drop Implementation
     override suspend fun getCityNameFromCoordinates(
         lat: Double,
         lon: Double,
         lang: String
     ): String? {
         return try {
-            val dtoList = weatherService.reverseGeocode(lat = lat, lon = lon, apiKey = API_KEY)
+            val dtoList = remoteDataSource.reverseGeocode(lat = lat, lon = lon, apiKey = API_KEY)
             val location = dtoList.firstOrNull()
             if (lang == "ar") {
                 location?.localNames?.get("ar") ?: location?.name
@@ -119,15 +116,15 @@ class WeatherRepositoryImpl @Inject constructor(
             val lat = weatherData.currentWeather.latitude
             val lon = weatherData.currentWeather.longitude
 
-            currentWeatherDao.deleteCurrentWeather(lat, lon)
-            forecastDao.deleteForecast(lat, lon)
+            localDataSource.deleteCurrentWeather(lat, lon)
+            localDataSource.deleteForecast(lat, lon)
 
-            currentWeatherDao.insertCurrentWeather(weatherData.currentWeather.toEntity())
+            localDataSource.insertCurrentWeather(weatherData.currentWeather.toEntity())
 
             val forecastEntities = weatherData.hourlyForecast.map {
                 it.toEntity(weatherData.currentWeather.city, lat, lon)
             }
-            forecastDao.insertForecast(forecastEntities)
+            localDataSource.insertForecast(forecastEntities)
 
             Log.d("WeatherRepository", "Weather data cached successfully")
         } catch (e: Exception) {

@@ -13,7 +13,6 @@ import javax.inject.Singleton
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
-// Define strict sealed classes/enums for our settings to prevent typos
 enum class LocationMode { GPS, MAP }
 enum class TempUnit { CELSIUS, KELVIN, FAHRENHEIT }
 enum class WindUnit { METER_SEC, MILE_HOUR }

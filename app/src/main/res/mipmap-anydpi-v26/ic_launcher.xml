@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
-    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+<adaptive-icon xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:ignore="MonochromeLauncherIcon">
+
+    <!--
+      BACKGROUND LAYER
+      A solid color drawn behind your foreground artwork.
+      The color is defined in res/values/colors.xml.
+      Android clips both layers to whatever shape the launcher uses
+      (circle, squircle, rounded square, etc.)
+    -->
+    <background android:drawable="@color/ic_launcher_background"/>
+
+    <!--
+      FOREGROUND LAYER
+      Your full-color icon artwork (the wizard hat, lightning bolt, etc.)
+      Lives in res/drawable/ic_launcher_foreground.xml
+      Should be centered within a 108dp canvas with ~18dp safe-zone padding
+      so it's never clipped when the launcher applies a circle mask.
+    -->
+    <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+
+
 </adaptive-icon>

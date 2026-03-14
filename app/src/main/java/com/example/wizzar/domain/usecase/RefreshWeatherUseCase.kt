@@ -2,8 +2,8 @@ package com.example.wizzar.domain.usecase
 
 
 import com.example.wizzar.domain.location.LocationServiceChecker
-import com.example.wizzar.domain.model.DomainError
-import com.example.wizzar.domain.model.Result
+import com.example.wizzar.domain.util.DomainError
+import com.example.wizzar.domain.util.Result
 import com.example.wizzar.domain.model.WeatherData
 import com.example.wizzar.domain.repository.WeatherRepository
 import javax.inject.Inject

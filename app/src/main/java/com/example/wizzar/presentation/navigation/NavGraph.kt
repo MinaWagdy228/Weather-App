@@ -53,9 +53,7 @@ fun NavGraph(
             arguments = listOf(navArgument("source") { defaultValue = "favorites" })
         ) {
             MapScreen(
-                onNavigateBack = { message ->
-                    // Optionally, you could pass this message back to Favorites via SavedStateHandle,
-                    // but popping the stack is all we need to return to the updated list!
+                onNavigateBack = {
                     navController.popBackStack()
                 })
         }

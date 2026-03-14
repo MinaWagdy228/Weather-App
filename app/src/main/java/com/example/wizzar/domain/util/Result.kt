@@ -6,7 +6,6 @@ sealed class Result<out T> {
 }
 
 sealed class DomainError(val message: String) {
-    data class InvalidLocationError(val msg: String = "Cannot fetch weather without valid location") : DomainError(msg)
     data class LocationServiceDisabledError(val msg: String = "Location service is disabled") : DomainError(msg)
     data class IncompleteDataError(val msg: String = "Weather data missing required fields") : DomainError(msg)
     data class NoDataAvailableError(val msg: String = "No internet and no cached data") : DomainError(msg)

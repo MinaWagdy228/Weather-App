@@ -18,23 +18,18 @@ class RefreshWeatherUseCase @Inject constructor(
         lang: String = "en",
         forceRefresh: Boolean = false
     ): Result<WeatherData> {
-        // BUSINESS RULE 0: Check if location service is enabled
         if (!locationServiceChecker.isEnabled()) {
             return Result.Error(DomainError.LocationServiceDisabledError())
         }
 
-        // BUSINESS RULE 2: Don't fetch if we have fresh data (< 10 minutes old)
         val cachedWeather = weatherRepository.getCachedWeather(lat, lon)
-        // Bypasses the cache check if forceRefresh is true
         if (!forceRefresh && cachedWeather != null && cachedWeather.isFresh()) {
             return Result.Success(cachedWeather)
         }
 
-        // BUSINESS RULE 3: Fetch fresh data
         return try {
             val freshWeather = weatherRepository.fetchWeatherFromApi(lat, lon, lang)
 
-            // BUSINESS RULE 4: Validate completeness
             if (!freshWeather.isComplete()) {
                 return Result.Error(DomainError.IncompleteDataError())
             }
@@ -44,7 +39,6 @@ class RefreshWeatherUseCase @Inject constructor(
             Result.Success(freshWeather)
 
         } catch (_: Exception) {
-            // BUSINESS RULE 5: On network error, return cached data if available
             cachedWeather?.let { Result.Success(it) }
                 ?: Result.Error(DomainError.NoDataAvailableError())
         }

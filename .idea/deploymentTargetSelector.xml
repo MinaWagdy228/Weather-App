@@ -19,6 +19,15 @@
       <SelectionState runConfigName="AlertsLocalDataSourceImplTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="FavoritesLocalDataSourceImplTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="observeAllFavorites_multipleFavoritesInserted_emitsCompleteList()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="deleteFavorite_existingCoordinates_removesFromDatabase()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

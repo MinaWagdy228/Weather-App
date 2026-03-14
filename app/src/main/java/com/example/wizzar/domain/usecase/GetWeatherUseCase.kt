@@ -91,7 +91,4 @@ class GetWeatherUseCase @Inject constructor(
     suspend fun getCachedWeather(latitude: Double, longitude: Double): WeatherData? {
         return repository.getCachedWeather(latitude, longitude)
     }
-    suspend fun getCityName(lat: Double, lon: Double, lang: String = "en"): String? {
-        return repository.getCityNameFromCoordinates(lat, lon, lang)
-    }
 }

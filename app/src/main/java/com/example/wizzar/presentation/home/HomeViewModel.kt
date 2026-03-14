@@ -3,6 +3,7 @@ package com.example.wizzar.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wizzar.data.dataSource.local.datastore.AppLanguage
+import com.example.wizzar.data.dataSource.local.datastore.LocationMode
 import com.example.wizzar.domain.usecase.GetActiveLocationUseCase
 import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase
@@ -32,13 +33,31 @@ class HomeViewModel @Inject constructor(
     private var observeJob: Job? = null
 
     init {
-        fetchWeatherForCurrentLocation()
+        // Automatically fetch weather when ViewModel is created AND when location settings change
+        observeLocationSettingsChange()
+    }
+
+    private fun observeLocationSettingsChange() {
+        viewModelScope.launch {
+            manageSettingsUseCase.observeSettings()
+                .map { settings ->
+                    // Create a unique key for location configuration
+                    // If any of these change, we need to switch the location source
+                    Triple(settings.locationMode, settings.mapLat, settings.mapLon)
+                }
+                .distinctUntilChanged()
+                .collect {
+                    // This triggers the initial fetch as well as any subsequent updates
+                    fetchWeatherForCurrentLocation(forceRefresh = false)
+                }
+        }
     }
 
     fun fetchWeatherForCurrentLocation(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _isRefreshing.value = true
 
+            // Logic determines whether to use GPS or Map based on current settings
             val activeLocation = getActiveLocationUseCase.execute()
 
             if (activeLocation == null) {
@@ -53,8 +72,10 @@ class HomeViewModel @Inject constructor(
             val settings = manageSettingsUseCase.observeSettings().first()
             val apiLanguage = if (settings.language == AppLanguage.ARABIC) "ar" else "en"
 
+            // Start observing the DB for this specific location
             startObservingWeather(stableLat, stableLon)
 
+            // Trigger network refresh
             val result = getWeatherUseCase.refreshWeather(stableLat, stableLon, apiLanguage, forceRefresh)
 
             if (result is Result.Error) {

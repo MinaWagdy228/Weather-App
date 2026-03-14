@@ -21,7 +21,6 @@ sealed class ScreenRoutes(val route: String, val title: String, val icon: ImageV
         }
     }
 
-    // NEW: The Details Screen route. It uses a dynamic path to accept coordinates.
     object FavoriteDetails : ScreenRoutes("favorite_details/{lat}/{lon}", "Details", Icons.Default.Info) {
         // A helper function to easily build the navigation string
         fun createRoute(lat: Double, lon: Double): String {

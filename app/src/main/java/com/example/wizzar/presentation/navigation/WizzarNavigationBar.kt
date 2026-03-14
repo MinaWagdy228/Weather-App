@@ -33,10 +33,8 @@ fun WizzarNavigationBar(navController: NavController, mainViewModel: MainViewMod
         ScreenRoutes.Settings
     )
 
-    // 1. Observe the lightweight boolean directly
     val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
 
-    // 2. Select colors dynamically
     val barColor = if (isDaytime) SkyBlueBase else SkyBase
     val unselectedContentColor = if (isDaytime) Color.Gray else TextGray
     val contentColor = if (isDaytime) Color.Black else TextWhite

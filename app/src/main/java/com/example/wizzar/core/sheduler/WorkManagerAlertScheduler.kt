@@ -3,7 +3,9 @@ package com.example.wizzar.core.sheduler
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.wizzar.core.workers.WeatherAlertWorker
@@ -39,17 +41,17 @@ class WorkManagerAlertScheduler @Inject constructor(
             .addTag(alert.id)
             .build()
 
-//        val immediateWork = OneTimeWorkRequestBuilder<WeatherAlertWorker>()
-//            .setInputData(inputData)
-//            .setConstraints(constraints)
-//            .build()
-//
-//        workManager.enqueue(immediateWork)
-//        workManager.enqueueUniquePeriodicWork(
-//            alert.id, // Unique name
-//            ExistingPeriodicWorkPolicy.UPDATE,
-//            workRequest
-//        )
+        val immediateWork = OneTimeWorkRequestBuilder<WeatherAlertWorker>()
+            .setInputData(inputData)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueue(immediateWork)
+        workManager.enqueueUniquePeriodicWork(
+            alert.id,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
     }
 
     override fun cancel(alertId: String) {

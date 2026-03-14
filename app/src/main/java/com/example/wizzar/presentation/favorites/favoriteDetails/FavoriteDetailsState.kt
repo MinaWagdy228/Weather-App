@@ -1,4 +1,4 @@
-package com.example.wizzar.presentation.favorites
+package com.example.wizzar.presentation.favorites.favoriteDetails
 
 import com.example.wizzar.data.dataSource.local.datastore.TempUnit
 import com.example.wizzar.data.dataSource.local.datastore.WindUnit

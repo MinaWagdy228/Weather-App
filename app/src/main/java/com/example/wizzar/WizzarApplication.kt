@@ -33,7 +33,6 @@ class WizzarApplication : Application(), Configuration.Provider {
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // 1. Channel for Standard Weather Notifications
             val standardChannel = NotificationChannel(
                 "weather_notification_channel",
                 "Weather Notifications",
@@ -42,7 +41,6 @@ class WizzarApplication : Application(), Configuration.Provider {
                 description = "Standard alerts for weather conditions"
             }
 
-            // 2. Channel for Loud Alarms (Bypasses Do Not Disturb if user allows)
             val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             val audioAttributes = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)

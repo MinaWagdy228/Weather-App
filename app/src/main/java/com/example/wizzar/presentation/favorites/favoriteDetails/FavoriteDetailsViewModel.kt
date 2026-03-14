@@ -1,4 +1,4 @@
-package com.example.wizzar.presentation.favorites
+package com.example.wizzar.presentation.favorites.favoriteDetails
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase
 import com.example.wizzar.domain.util.Result
+import com.example.wizzar.presentation.favorites.favoriteDetails.FavoriteDetailsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

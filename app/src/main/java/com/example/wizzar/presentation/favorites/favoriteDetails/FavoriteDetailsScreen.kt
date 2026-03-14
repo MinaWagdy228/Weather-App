@@ -1,4 +1,4 @@
-package com.example.wizzar.presentation.favorites
+package com.example.wizzar.presentation.favorites.favoriteDetails
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -13,6 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.wizzar.R
+import com.example.wizzar.presentation.favorites.favoriteDetails.FavoriteDetailsState
+import com.example.wizzar.presentation.favorites.favoriteDetails.FavoriteDetailsViewModel
 import com.example.wizzar.presentation.home.HomeScreenContent
 import com.example.wizzar.ui.theme.PrimaryBlue
 

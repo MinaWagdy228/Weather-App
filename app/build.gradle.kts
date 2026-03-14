@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.hilt.work)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -108,5 +109,27 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
+        // ... your existing dependencies ...
+
+        // MockK: The industry standard for mocking in Kotlin
+        testImplementation("io.mockk:mockk:1.13.8")
+        androidTestImplementation("io.mockk:mockk-android:1.13.8")
+
+        // Coroutines Testing: For controlling time and testing suspend functions
+        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+        androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+
+        // Turbine: The absolute best library for testing Kotlin Flows
+        testImplementation("app.cash.turbine:turbine:1.1.0")
+
+        // Architecture Components Core Testing (InstantTaskExecutorRule)
+        testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+        // Room Testing: For testing your DAOs locally
+        androidTestImplementation("androidx.room:room-testing:2.6.1")
+
+        // Google Truth: For very readable assertions (e.g., assertThat(x).isEqualTo(y))
+        testImplementation("com.google.truth:truth:1.4.2")
+        androidTestImplementation("com.google.truth:truth:1.4.2")
 
 }

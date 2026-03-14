@@ -57,6 +57,28 @@
 
     <!-- Alerts -->
     <string name="alerts_screen_title">Alerts Screen</string>
+    <string name="weather_alerts_title">Weather Alerts</string>
+    <string name="add_alert_desc">Add Alert</string>
+    <string name="permission_notification_needed">Notification permission is needed to receive weather alerts.</string>
+    <string name="grant">Grant</string>
+    <string name="no_alarms_set">You haven\'t set any alarms yet.</string>
+    <string name="alarm_deleted">Alarm for %1$s deleted</string>
+    <string name="end_time_error">End time must be after Start time!</string>
+    <string name="start_duration">Start Duration</string>
+    <string name="end_duration">End Duration</string>
+    <string name="notify_me_by">Notify me by</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="cancel">CANCEL</string>
+    <string name="save">SAVE</string>
+    <string name="select_time">Select Time</string>
+    <string name="time_am">AM</string>
+    <string name="time_pm">PM</string>
+
+    <string name="ensure_gps_enabled">Could not determine current location. Ensure GPS is enabled.</string>
+    <string name="selected_location_default">Selected Location</string>
+    <string name="alarm_less_than_minute">Alarm set for less than a minute from now.</string>
+    <string name="alarm_set_for">Alarm set for %1$d hours and %2$d minutes from now.</string>
 
     <!-- Temporary / Error -->
     <string name="unknown_error">Unknown error</string>

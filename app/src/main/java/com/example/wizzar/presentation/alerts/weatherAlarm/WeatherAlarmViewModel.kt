@@ -1,4 +1,4 @@
-package com.example.wizzar.presentation.alerts
+package com.example.wizzar.presentation.alerts.weatherAlarm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

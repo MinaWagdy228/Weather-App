@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.wizzar.presentation.alerts.AlertsScreen
-import com.example.wizzar.presentation.favorites.FavoriteDetailsScreen
+import com.example.wizzar.presentation.favorites.favoriteDetails.FavoriteDetailsScreen
 import com.example.wizzar.presentation.favorites.FavoritesScreen
 import com.example.wizzar.presentation.home.HomeScreen
 import com.example.wizzar.presentation.map.MapScreen

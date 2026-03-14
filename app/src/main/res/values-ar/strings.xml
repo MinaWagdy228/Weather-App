@@ -57,6 +57,28 @@
 
     <!-- Alerts -->
     <string name="alerts_screen_title">شاشة التنبيهات</string>
+    <string name="weather_alerts_title">تنبيهات الطقس</string>
+    <string name="add_alert_desc">إضافة تنبيه</string>
+    <string name="permission_notification_needed">مطلوب إذن الإشعارات لتلقي تنبيهات الطقس.</string>
+    <string name="grant">منح</string>
+    <string name="no_alarms_set">لم يتم تعيين أي منبهات بعد.</string>
+    <string name="alarm_deleted">تم حذف التنبيه لمدينة %1$s</string>
+    <string name="end_time_error">وقت الانتهاء يجب أن يكون بعد وقت البدء!</string>
+    <string name="start_duration">وقت البدء</string>
+    <string name="end_duration">وقت الانتهاء</string>
+    <string name="notify_me_by">نبهني بواسطة</string>
+    <string name="alarm">منبه</string>
+    <string name="notification">إشعار</string>
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="select_time">اختر الوقت</string>
+    <string name="time_am">ص</string>
+    <string name="time_pm">م</string>
+
+    <string name="ensure_gps_enabled">تعذر تحديد الموقع الحالي. تأكد من تفعيل GPS.</string>
+    <string name="selected_location_default">الموقع المحدد</string>
+    <string name="alarm_less_than_minute">تم ضبط التنبيه لأقل من دقيقة من الآن.</string>
+    <string name="alarm_set_for">تم ضبط التنبيه بعد %1$d ساعة و %2$d دقيقة من الآن.</string>
 
     <!-- Temporary / Error -->
     <string name="unknown_error">خطأ غير معروف</string>

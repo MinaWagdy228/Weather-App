@@ -28,19 +28,15 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val navController = rememberNavController()
             val mainViewModel: MainViewModel = hiltViewModel()
-
             val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
 
             WizzarTheme(isDaytime = isDaytime) {
-
                 Box(modifier = Modifier.Companion.fillMaxSize()) {
-
                     if (isDaytime) {
                         SunnyBackground()
                     } else {
                         StarryBackground()
                     }
-
                     Scaffold(
                         bottomBar = {
                             WizzarNavigationBar(

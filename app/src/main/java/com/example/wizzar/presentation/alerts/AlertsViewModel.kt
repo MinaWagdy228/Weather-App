@@ -21,6 +21,13 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.round
 
+import com.example.wizzar.R
+
+sealed class AlertMessage {
+    data class StringValue(val value: String) : AlertMessage()
+    class StringResource(val resId: Int, vararg val args: Any) : AlertMessage()
+}
+
 @HiltViewModel
 class AlertsViewModel @Inject constructor(
     private val manageAlertsUseCase: ManageAlertsUseCase,
@@ -58,7 +65,7 @@ class AlertsViewModel @Inject constructor(
         startHour: Int, startMinute: Int,
         endHour: Int, endMinute: Int,
         isAlarm: Boolean,
-        onResult: (String) -> Unit
+        onResult: (AlertMessage) -> Unit
     ) {
         viewModelScope.launch {
 
@@ -77,7 +84,7 @@ class AlertsViewModel @Inject constructor(
                     targetLat = loc.latitude
                     targetLon = loc.longitude
                 } else {
-                    onResult("Could not determine current location. Ensure GPS is enabled.")
+                    onResult(AlertMessage.StringResource(R.string.ensure_gps_enabled))
                     return@launch
                 }
             }
@@ -115,6 +122,29 @@ class AlertsViewModel @Inject constructor(
         }
     }
 
+    fun updateAlert(
+        alert: WeatherAlert,
+        startHour: Int, startMinute: Int,
+        endHour: Int, endMinute: Int,
+        isAlarm: Boolean,
+        onResult: (AlertMessage) -> Unit
+    ) {
+        viewModelScope.launch {
+            val startTimeInMinutes = (startHour * 60L) + startMinute
+            val endTimeInMinutes = (endHour * 60L) + endMinute
+
+            val updatedAlert = alert.copy(
+                startTime = startTimeInMinutes,
+                endTime = endTimeInMinutes,
+                isAlarmSound = isAlarm
+            )
+            manageAlertsUseCase.createAlert(updatedAlert)
+
+            val timeMessage = calculateTimeUntilAlarm(startHour, startMinute)
+            onResult(timeMessage)
+        }
+    }
+
     fun removeAlert(alertId: String) {
         viewModelScope.launch {
             manageAlertsUseCase.removeAlert(alertId)
@@ -128,7 +158,7 @@ class AlertsViewModel @Inject constructor(
         }
     }
 
-    private fun calculateTimeUntilAlarm(startHour: Int, startMinute: Int): String {
+    private fun calculateTimeUntilAlarm(startHour: Int, startMinute: Int): AlertMessage {
         val now = Calendar.getInstance()
         val currentHour = now.get(Calendar.HOUR_OF_DAY)
         val currentMinute = now.get(Calendar.MINUTE)
@@ -145,9 +175,16 @@ class AlertsViewModel @Inject constructor(
         }
 
         return if (diffHours == 0 && diffMinutes == 0) {
-            "Alarm set for less than a minute from now."
+            AlertMessage.StringResource(R.string.alarm_less_than_minute)
         } else {
-            "Alarm set for $diffHours hours and $diffMinutes minutes from now."
+            AlertMessage.StringResource(R.string.alarm_set_for, diffHours, diffMinutes)
+        }
+    }
+
+    fun undoRemoveAlert(alert: WeatherAlert) {
+        viewModelScope.launch {
+            // Re-inserts the exact same alert back into the database
+            manageAlertsUseCase.createAlert(alert)
         }
     }
 }

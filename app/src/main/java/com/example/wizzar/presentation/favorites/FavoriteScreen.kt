@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.wizzar.R
 import com.example.wizzar.data.dataSource.local.entity.FavoriteLocationEntity
 import com.example.wizzar.presentation.common.glassmorphic
+import com.example.wizzar.ui.theme.TextWhite
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,16 +45,17 @@ fun FavoritesScreen(
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.favorite_locations_title)) },
+                title = { Text(stringResource(R.string.favorite_locations_title), color = TextWhite) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
-                    // The Top-Right button to navigate to the Map Screen
                     IconButton(onClick = onNavigateToMap) {
                         Icon(
                             imageVector = Icons.Default.FavoriteBorder,
-                            contentDescription = stringResource(R.string.add_favorite_desc)
+                            contentDescription = stringResource(R.string.add_favorite_desc),
+                            tint = TextWhite
                         )
                     }
-                }
+                },
             )
         }
     ) { paddingValues ->
@@ -67,7 +69,8 @@ fun FavoritesScreen(
             ) {
                 Text(
                     stringResource(R.string.no_favorites_yet),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = TextWhite
                 )
             }
         } else {
@@ -115,7 +118,7 @@ fun FavoritesScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(color, shape = MaterialTheme.shapes.medium)
+                                    .background(color, shape = RoundedCornerShape(16.dp))
                                     .padding(end = 24.dp),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
@@ -151,8 +154,8 @@ fun FavoriteCityCard(
 ) {
     Card(
         modifier = Modifier.glassmorphic(RoundedCornerShape(16.dp)),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         onClick = onClick, // Navigates to the details screen!
     ) {
         Row(
@@ -163,15 +166,18 @@ fun FavoriteCityCard(
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = stringResource(R.string.favorited_city_desc),
+                tint = TextWhite
             )
             Text(
                 text = favorite.cityName,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                color = TextWhite
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = stringResource(R.string.check_details_desc),
+                tint = TextWhite
             )
         }
     }

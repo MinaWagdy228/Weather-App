@@ -56,7 +56,7 @@ class WeatherNotificationManager @Inject constructor(
         )
 
         val notification = NotificationCompat.Builder(context, "weather_alarm_channel")
-            .setSmallIcon(R.mipmap.ic_launcher) // Replace with your app's icon
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("SEVERE WEATHER: $cityName")
             .setContentText(weatherDescription)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

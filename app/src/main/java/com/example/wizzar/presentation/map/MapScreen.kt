@@ -41,7 +41,7 @@ fun MapScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    // Initialize OSMDroid Configuration (Required)
+    // Initialize OSMDroid Configuration
     LaunchedEffect(Unit) {
         Configuration.getInstance().userAgentValue = context.packageName
     }

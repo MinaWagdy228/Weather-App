@@ -106,10 +106,23 @@ fun SettingsScreen(
 
         SettingsCard(title = stringResource(R.string.api_language)) {
             SegmentedControl(
-                items = listOf(stringResource(R.string.english), stringResource(R.string.arabic)),
-                selectedIndex = if (settingsState.language == AppLanguage.ARABIC) 1 else 0,
+                items = listOf(
+                    stringResource(R.string.english),
+                    stringResource(R.string.arabic),
+                    stringResource(R.string.default_language)
+                ),
+                selectedIndex = when (settingsState.language) {
+                    AppLanguage.ENGLISH -> 0
+                    AppLanguage.ARABIC -> 1
+                    else -> 2 // DEFAULT
+                },
                 onItemSelected = { index ->
-                    viewModel.updateLanguage(if (index == 0) AppLanguage.ENGLISH else AppLanguage.ARABIC)
+                    val selectedLanguage = when (index) {
+                        0 -> AppLanguage.ENGLISH
+                        1 -> AppLanguage.ARABIC
+                        else -> AppLanguage.DEFAULT
+                    }
+                    viewModel.updateLanguage(selectedLanguage)
                 }
             )
         }

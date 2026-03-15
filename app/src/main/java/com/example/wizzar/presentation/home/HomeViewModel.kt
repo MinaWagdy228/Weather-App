@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -82,7 +83,11 @@ class HomeViewModel @Inject constructor(
             val stableLon = activeLocation.longitude
 
             val settings = manageSettingsUseCase.observeSettings().first()
-            val apiLanguage = if (settings.language == AppLanguage.ARABIC) "ar" else "en"
+            val apiLanguage = when (settings.language) {
+                AppLanguage.ARABIC -> "ar"
+                AppLanguage.ENGLISH -> "en"
+                AppLanguage.DEFAULT -> if (Locale.getDefault().language == "ar") "ar" else "en"
+            }
 
             // Start observing the DB for this specific location
             startObservingWeather(stableLat, stableLon)

@@ -400,7 +400,7 @@ fun TimePickerDialog(
 
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-                    TextButton(onClick = { onConfirm(timePickerState.hour, timePickerState.minute) }) { Text("OK") }
+                    TextButton(onClick = { onConfirm(timePickerState.hour, timePickerState.minute) }) { Text(stringResource(R.string.time_picker_ok)) }
                 }
             }
         }

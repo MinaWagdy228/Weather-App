@@ -82,4 +82,6 @@
 
     <!-- Temporary / Error -->
     <string name="unknown_error">خطأ غير معروف</string>
+    <string name="time_picker_ok">تم</string>
+    <string name="default_language">الافتراضي</string>
 </resources>

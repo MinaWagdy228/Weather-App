@@ -45,10 +45,12 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             manageSettingsUseCase.updateLanguage(language)
             // Tell Android to physically switch the app's resource locale
-            val languageCode = if (language == AppLanguage.ARABIC) "ar" else "en"
-            AppCompatDelegate.setApplicationLocales(
-                LocaleListCompat.forLanguageTags(languageCode)
-            )
+            val locales = when (language) {
+                AppLanguage.ARABIC -> LocaleListCompat.forLanguageTags("ar")
+                AppLanguage.ENGLISH -> LocaleListCompat.forLanguageTags("en")
+                AppLanguage.DEFAULT -> LocaleListCompat.getEmptyLocaleList()
+            }
+            AppCompatDelegate.setApplicationLocales(locales)
         }
     }
 

@@ -65,6 +65,7 @@ To build and run this project locally, follow these steps:
 5. Sync the Gradle files and run the app on an emulator or physical device running Android 7.0 (API 24) or higher.
 
 📂 Project Structure Overview:
+
 com.example.wizzar
 │
 ├── core/             # Schedulers (AlarmManager/WorkManager), Workers, Notifications, Receivers

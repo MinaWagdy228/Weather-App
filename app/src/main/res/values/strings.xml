@@ -24,6 +24,7 @@
     <string name="arabic">Arabic</string>
     <string name="lang_english">English</string>
     <string name="lang_arabic">Arabic</string>
+    <string name="default_language">Default</string>
 
     <!-- Home -->
     <string name="feels_like_high_low">Feels like %1$s · High %2$s · Low %3$s</string>
@@ -82,4 +83,5 @@
 
     <!-- Temporary / Error -->
     <string name="unknown_error">Unknown error</string>
+    <string name="time_picker_ok">OK</string>
 </resources>

@@ -72,9 +72,8 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, tempUnit: String) {
             tint = WarningYellow,
             modifier = Modifier.size(120.dp)
         )
-
         Text(
-            text = "${currentWeather.temperature.roundToInt().toLocalizedNumbers()}$tempUnit",
+            text = "${currentWeather.temperature.roundToInt().toLocalizedNumbers()}\u200E$tempUnit",
             color = TextWhite,
             style = Typography.displayLarge,
             modifier = Modifier.padding(top = 16.dp)
@@ -90,9 +89,9 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, tempUnit: String) {
         Text(
             text = stringResource(
                 R.string.feels_like_high_low,
-                "${currentWeather.feelsLike.roundToInt().toLocalizedNumbers()}$tempUnit",
-                "${currentWeather.maxTemp.roundToInt().toLocalizedNumbers()}$tempUnit",
-                "${currentWeather.minTemp.roundToInt().toLocalizedNumbers()}$tempUnit"
+                "${currentWeather.feelsLike.roundToInt().toLocalizedNumbers()}\u200E$tempUnit",
+                "${currentWeather.maxTemp.roundToInt().toLocalizedNumbers()}\u200E$tempUnit",
+                "${currentWeather.minTemp.roundToInt().toLocalizedNumbers()}\u200E$tempUnit"
             ),
             color = TextGray,
             style = Typography.bodyMedium,
@@ -237,7 +236,7 @@ fun HourlyItemCard(item: HourlyForecast, timeFormat: SimpleDateFormat, tempUnit:
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "${item.temperature.roundToInt().toLocalizedNumbers()}$tempUnit", color = TextWhite, fontWeight = FontWeight.Bold)
+        Text(text = "${item.temperature.roundToInt().toLocalizedNumbers()}\u200E$tempUnit", color = TextWhite, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -283,7 +282,7 @@ fun DailyItemRow(item: DailyForecast, dayFormat: SimpleDateFormat, tempUnit: Str
         )
 
         Text(
-            text = "${item.minTemp.roundToInt().toLocalizedNumbers()}$tempUnit / ${item.maxTemp.roundToInt().toLocalizedNumbers()}$tempUnit",
+            text = "${item.minTemp.roundToInt().toLocalizedNumbers()}\u200E$tempUnit / ${item.maxTemp.roundToInt().toLocalizedNumbers()}\u200E$tempUnit",
             color = TextWhite,
             style = Typography.bodyLarge,
             modifier = Modifier.weight(1f),

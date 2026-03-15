@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.wizzar.presentation.common.StarryBackground
 import com.example.wizzar.presentation.common.SunnyBackground
@@ -30,6 +31,13 @@ class MainActivity : AppCompatActivity() {
             val mainViewModel: MainViewModel = hiltViewModel()
             val isDaytime by mainViewModel.isDaytime.collectAsStateWithLifecycle()
 
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            val showBottomBar = currentRoute != null &&
+                    !currentRoute.startsWith("map") &&
+                    !currentRoute.startsWith("favorite_details")
+
             WizzarTheme(isDaytime = isDaytime) {
                 Box(modifier = Modifier.Companion.fillMaxSize()) {
                     if (isDaytime) {
@@ -39,10 +47,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     Scaffold(
                         bottomBar = {
-                            WizzarNavigationBar(
-                                navController = navController,
-                                mainViewModel = mainViewModel
-                            )
+                            if (showBottomBar) {
+                                WizzarNavigationBar(
+                                    navController = navController,
+                                    mainViewModel = mainViewModel
+                                )
+                            }
                         },
                         containerColor = Color.Companion.Transparent
                     ) { innerPadding ->

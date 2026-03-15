@@ -3,23 +3,25 @@ package com.example.wizzar.presentation.map.view
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wizzar.data.dataSource.local.datastore.AppLanguage
 import com.example.wizzar.data.dataSource.local.datastore.LocationMode
 import com.example.wizzar.domain.model.LocationSearchResult
-import com.example.wizzar.domain.repository.WeatherRepository
 import com.example.wizzar.domain.usecase.ManageFavoritesUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase
+import com.example.wizzar.domain.usecase.SearchLocationsUseCase
 import com.example.wizzar.presentation.map.MapUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.round
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository,
+    private val searchLocationsUseCase: SearchLocationsUseCase,
     private val manageFavoritesUseCase: ManageFavoritesUseCase,
     private val manageSettingsUseCase: ManageSettingsUseCase,
     savedStateHandle: SavedStateHandle
@@ -47,7 +49,7 @@ class MapViewModel @Inject constructor(
         if (query.length > 2) {
             searchJob = viewModelScope.launch {
                 delay(500)
-                val results = weatherRepository.searchLocations(query)
+                val results = searchLocationsUseCase.search(query)
                 // Update the results list in the UI
                 _uiState.update { it.copy(searchResults = results) }
             }
@@ -73,14 +75,21 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun onMapPinDropped(latitude: Double, longitude: Double, currentLanguage: String = "en") {
+    fun onMapPinDropped(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
+
+            val settings = manageSettingsUseCase.observeSettings().first()
+            val currentLanguage = when (settings.language) {
+                AppLanguage.ARABIC -> "ar"
+                AppLanguage.ENGLISH -> "en"
+                AppLanguage.DEFAULT -> if (Locale.getDefault().language == "ar") "ar" else "en"
+            }
 
             val lat = latitude.roundUpToThreeDecimals()
             val lon = longitude.roundUpToThreeDecimals()
 
-            val cityName = weatherRepository.getCityNameFromCoordinates(lat, lon, currentLanguage)
+            val cityName = searchLocationsUseCase.getCityName(lat, lon, currentLanguage)
                 ?: "Selected Location"
 
             _uiState.update {

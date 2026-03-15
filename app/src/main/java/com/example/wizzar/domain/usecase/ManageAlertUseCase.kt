@@ -4,12 +4,15 @@ import com.example.wizzar.di.ExactAlarmScheduler
 import com.example.wizzar.di.WindowNotificationScheduler
 import com.example.wizzar.domain.model.WeatherAlert
 import com.example.wizzar.domain.repository.AlertsRepository
+import com.example.wizzar.domain.repository.WeatherRepository
 import com.example.wizzar.domain.scheduler.WeatherAlertScheduler
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ManageAlertsUseCase @Inject constructor(
     private val repository: AlertsRepository,
+    private val weatherRepository: WeatherRepository, // Inject WeatherRepository
     @ExactAlarmScheduler private val exactAlarmScheduler: WeatherAlertScheduler,
     @WindowNotificationScheduler private val windowNotificationScheduler: WeatherAlertScheduler
 ) {
@@ -17,11 +20,28 @@ class ManageAlertsUseCase @Inject constructor(
         return repository.observeAlerts()
     }
 
+    suspend fun refreshAlertCityNames(language: String) {
+        val alerts = repository.observeAlerts().first()
+        alerts.forEach { alert ->
+            try {
+                val newName = weatherRepository.getCityNameFromCoordinates(
+                    alert.latitude,
+                    alert.longitude,
+                    language
+                )
+                if (!newName.isNullOrBlank()) {
+                    val updatedAlert = alert.copy(cityName = newName)
+                    repository.saveAlert(updatedAlert)
+                }
+            } catch (e: Exception) {
+                // Ignore errors during background name refresh
+            }
+        }
+    }
+
     suspend fun createAlert(alert: WeatherAlert) {
         repository.saveAlert(alert)
 
-        // Safety check: Cancel on both systems first in case the user
-        // edited an existing alert and switched its type!
         exactAlarmScheduler.cancel(alert.id)
         windowNotificationScheduler.cancel(alert.id)
 
@@ -36,13 +56,8 @@ class ManageAlertsUseCase @Inject constructor(
     suspend fun removeAlert(alertId: String) {
         repository.deleteAlert(alertId)
 
-        // Blanket cancel to ensure no ghost background tasks remain
         exactAlarmScheduler.cancel(alertId)
         windowNotificationScheduler.cancel(alertId)
-    }
-
-    suspend fun getAlert(alertId: String): WeatherAlert? {
-        return repository.getAlertById(alertId)
     }
 
     suspend fun snoozeAlert(alertId: String) {

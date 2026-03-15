@@ -2,12 +2,12 @@ package com.example.wizzar.presentation.alerts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wizzar.data.dataSource.local.datastore.LocationMode
-import com.example.wizzar.domain.location.LocationProvider
 import com.example.wizzar.domain.model.WeatherAlert
+import com.example.wizzar.domain.usecase.GetLocationUseCase
 import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import com.example.wizzar.domain.usecase.ManageAlertsUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase
+import com.example.wizzar.domain.usecase.SearchLocationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +22,9 @@ import javax.inject.Inject
 import kotlin.math.round
 
 import com.example.wizzar.R
+import com.example.wizzar.data.dataSource.local.datastore.AppLanguage
+import com.example.wizzar.data.dataSource.local.datastore.LocationMode
+import java.util.Locale
 
 sealed class AlertMessage {
     data class StringValue(val value: String) : AlertMessage()
@@ -31,9 +34,10 @@ sealed class AlertMessage {
 @HiltViewModel
 class AlertsViewModel @Inject constructor(
     private val manageAlertsUseCase: ManageAlertsUseCase,
-    private val locationProvider: LocationProvider,
+    private val getLocationUseCase: GetLocationUseCase,
     private val getWeatherUseCase: GetWeatherUseCase,
-    private val manageSettingsUseCase: ManageSettingsUseCase
+    private val manageSettingsUseCase: ManageSettingsUseCase,
+    private val searchLocationsUseCase: SearchLocationsUseCase // Add this
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AlertsUiState())
@@ -69,7 +73,6 @@ class AlertsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-            // 1. Get the active location from Settings (Synchronized with Home Screen)
             val settings = manageSettingsUseCase.observeSettings().first()
 
             val targetLat: Double
@@ -79,7 +82,7 @@ class AlertsViewModel @Inject constructor(
                 targetLat = settings.mapLat
                 targetLon = settings.mapLon
             } else {
-                val loc = locationProvider.getCurrentLocation()
+                val loc = getLocationUseCase()
                 if (loc.isValid()) {
                     targetLat = loc.latitude
                     targetLon = loc.longitude
@@ -89,15 +92,19 @@ class AlertsViewModel @Inject constructor(
                 }
             }
 
-            // Round coordinates to 3 decimals to perfectly match the HomeViewModel cache logic
             val finalLat = round(targetLat * 1000) / 1000.0
             val finalLon = round(targetLon * 1000) / 1000.0
 
-            // 2. Fetch directly from the stabilized local database via the UseCase
-            val cachedWeather = getWeatherUseCase.getCachedWeather(finalLat, finalLon)
-            val cityName = cachedWeather?.currentWeather?.city ?: "Selected Location"
+            val currentLanguage = when (settings.language) {
+                AppLanguage.ARABIC -> "ar"
+                AppLanguage.ENGLISH -> "en"
+                AppLanguage.DEFAULT -> if (Locale.getDefault().language == "ar") "ar" else "en"
+            }
 
-            // 3. We store times as "Minutes since Midnight" (0 to 1439) for easy daily repeating math
+            val cityName = searchLocationsUseCase.getCityName(finalLat, finalLon, currentLanguage)
+                ?: getWeatherUseCase.getCachedWeather(finalLat, finalLon)?.currentWeather?.city
+                ?: "Selected Location"
+
             val startTimeInMinutes = (startHour * 60L) + startMinute
             val endTimeInMinutes = (endHour * 60L) + endMinute
 
@@ -109,14 +116,13 @@ class AlertsViewModel @Inject constructor(
                 latitude = finalLat,
                 longitude = finalLon,
                 cityName = cityName,
-                isActive = true, // On by default
+                isActive = true,
                 snoozedUntil = null,
                 lastTriggeredDate = null
             )
 
             manageAlertsUseCase.createAlert(newAlert)
 
-            // 4. Calculate "X hours and Y minutes left" for the Toast
             val timeMessage = calculateTimeUntilAlarm(startHour, startMinute)
             onResult(timeMessage)
         }

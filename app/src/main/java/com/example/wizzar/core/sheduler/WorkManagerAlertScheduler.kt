@@ -34,19 +34,18 @@ class WorkManagerAlertScheduler @Inject constructor(
 
         val workRequest = PeriodicWorkRequestBuilder<WeatherAlertWorker>(
             15, TimeUnit.MINUTES,
-            5, TimeUnit.MINUTES
         )
             .setInputData(inputData)
             .setConstraints(constraints)
             .addTag(alert.id)
             .build()
 
-        val immediateWork = OneTimeWorkRequestBuilder<WeatherAlertWorker>()
-            .setInputData(inputData)
-            .setConstraints(constraints)
-            .build()
-
-        workManager.enqueue(immediateWork)
+//        val immediateWork = OneTimeWorkRequestBuilder<WeatherAlertWorker>()
+//            .setInputData(inputData)
+//            .setConstraints(constraints)
+//            .build()
+//
+//        workManager.enqueue(immediateWork)
         workManager.enqueueUniquePeriodicWork(
             alert.id,
             ExistingPeriodicWorkPolicy.UPDATE,

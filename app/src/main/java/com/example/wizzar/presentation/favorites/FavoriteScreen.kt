@@ -125,6 +125,7 @@ fun FavoritesScreen(
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = stringResource(R.string.delete_desc),
+                                    tint = Color.Transparent
                                 )
                             }
                         },

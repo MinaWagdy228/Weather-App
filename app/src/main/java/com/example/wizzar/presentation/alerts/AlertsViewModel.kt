@@ -2,9 +2,8 @@ package com.example.wizzar.presentation.alerts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wizzar.data.dataSource.local.datastore.LocationMode
-import com.example.wizzar.domain.location.LocationProvider
 import com.example.wizzar.domain.model.WeatherAlert
+import com.example.wizzar.domain.usecase.GetLocationUseCase
 import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import com.example.wizzar.domain.usecase.ManageAlertsUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase
@@ -22,6 +21,7 @@ import javax.inject.Inject
 import kotlin.math.round
 
 import com.example.wizzar.R
+import com.example.wizzar.data.dataSource.local.datastore.LocationMode
 
 sealed class AlertMessage {
     data class StringValue(val value: String) : AlertMessage()
@@ -31,7 +31,7 @@ sealed class AlertMessage {
 @HiltViewModel
 class AlertsViewModel @Inject constructor(
     private val manageAlertsUseCase: ManageAlertsUseCase,
-    private val locationProvider: LocationProvider,
+    private val getLocationUseCase: GetLocationUseCase,
     private val getWeatherUseCase: GetWeatherUseCase,
     private val manageSettingsUseCase: ManageSettingsUseCase
 ) : ViewModel() {
@@ -78,7 +78,7 @@ class AlertsViewModel @Inject constructor(
                 targetLat = settings.mapLat
                 targetLon = settings.mapLon
             } else {
-                val loc = locationProvider.getCurrentLocation()
+                val loc = getLocationUseCase()
                 if (loc.isValid()) {
                     targetLat = loc.latitude
                     targetLon = loc.longitude

@@ -69,7 +69,6 @@ class AlertsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-            // 1. Get the active location from Settings (Synchronized with Home Screen)
             val settings = manageSettingsUseCase.observeSettings().first()
 
             val targetLat: Double
@@ -89,15 +88,12 @@ class AlertsViewModel @Inject constructor(
                 }
             }
 
-            // Round coordinates to 3 decimals to perfectly match the HomeViewModel cache logic
             val finalLat = round(targetLat * 1000) / 1000.0
             val finalLon = round(targetLon * 1000) / 1000.0
 
-            // 2. Fetch directly from the stabilized local database via the UseCase
             val cachedWeather = getWeatherUseCase.getCachedWeather(finalLat, finalLon)
             val cityName = cachedWeather?.currentWeather?.city ?: "Selected Location"
 
-            // 3. We store times as "Minutes since Midnight" (0 to 1439) for easy daily repeating math
             val startTimeInMinutes = (startHour * 60L) + startMinute
             val endTimeInMinutes = (endHour * 60L) + endMinute
 
@@ -109,14 +105,13 @@ class AlertsViewModel @Inject constructor(
                 latitude = finalLat,
                 longitude = finalLon,
                 cityName = cityName,
-                isActive = true, // On by default
+                isActive = true,
                 snoozedUntil = null,
                 lastTriggeredDate = null
             )
 
             manageAlertsUseCase.createAlert(newAlert)
 
-            // 4. Calculate "X hours and Y minutes left" for the Toast
             val timeMessage = calculateTimeUntilAlarm(startHour, startMinute)
             onResult(timeMessage)
         }

@@ -75,7 +75,7 @@ class WeatherAlertWorker @AssistedInject constructor(
                     (weather.temperature > 40.0 || weather.temperature < 0.0) ||
                     (weather.wind > 15.0)
 
-            if (true) {
+            if (isBadWeather) {
                 val description = "⚠️ SEVERE WEATHER: ${weather.description}. Check the app for details."
 
                 notificationManager.showStandardNotification(

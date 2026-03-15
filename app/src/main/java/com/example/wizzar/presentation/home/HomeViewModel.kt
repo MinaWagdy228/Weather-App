@@ -26,29 +26,41 @@ class HomeViewModel @Inject constructor(
 
     private val _uiEvent = MutableSharedFlow<String>()
     val uiEvent = _uiEvent.asSharedFlow()
-
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private var observeJob: Job? = null
 
     init {
-        // Automatically fetch weather when ViewModel is created AND when location settings change
-        observeLocationSettingsChange()
+        observeSettingsChanges()
     }
 
-    private fun observeLocationSettingsChange() {
+    private fun observeSettingsChanges() {
         viewModelScope.launch {
+            var lastLanguage: AppLanguage? = null
+
+            // Local data class to track relevant configuration changes
+            data class ConfigKey(
+                val mode: LocationMode,
+                val lat: Double?,
+                val lon: Double?,
+                val lang: AppLanguage
+            )
+
             manageSettingsUseCase.observeSettings()
                 .map { settings ->
-                    // Create a unique key for location configuration
-                    // If any of these change, we need to switch the location source
-                    Triple(settings.locationMode, settings.mapLat, settings.mapLon)
+                    ConfigKey(settings.locationMode, settings.mapLat, settings.mapLon, settings.language)
                 }
                 .distinctUntilChanged()
-                .collect {
-                    // This triggers the initial fetch as well as any subsequent updates
-                    fetchWeatherForCurrentLocation(forceRefresh = false)
+                .collect { config ->
+                    // Logic:
+                    // 1. If language changed -> Force Refresh (to overwrite English strings with Arabic)
+                    // 2. If valid location but language same -> Normal Refresh (cache check handles freshness)
+                    val shouldForce = lastLanguage != null && lastLanguage != config.lang
+
+                    lastLanguage = config.lang
+
+                    fetchWeatherForCurrentLocation(forceRefresh = shouldForce)
                 }
         }
     }

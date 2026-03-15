@@ -20,8 +20,6 @@ class ManageAlertsUseCase @Inject constructor(
     suspend fun createAlert(alert: WeatherAlert) {
         repository.saveAlert(alert)
 
-        // Safety check: Cancel on both systems first in case the user
-        // edited an existing alert and switched its type!
         exactAlarmScheduler.cancel(alert.id)
         windowNotificationScheduler.cancel(alert.id)
 
@@ -36,13 +34,8 @@ class ManageAlertsUseCase @Inject constructor(
     suspend fun removeAlert(alertId: String) {
         repository.deleteAlert(alertId)
 
-        // Blanket cancel to ensure no ghost background tasks remain
         exactAlarmScheduler.cancel(alertId)
         windowNotificationScheduler.cancel(alertId)
-    }
-
-    suspend fun getAlert(alertId: String): WeatherAlert? {
-        return repository.getAlertById(alertId)
     }
 
     suspend fun snoozeAlert(alertId: String) {

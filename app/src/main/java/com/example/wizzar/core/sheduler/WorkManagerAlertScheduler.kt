@@ -34,7 +34,6 @@ class WorkManagerAlertScheduler @Inject constructor(
 
         val workRequest = PeriodicWorkRequestBuilder<WeatherAlertWorker>(
             15, TimeUnit.MINUTES,
-            5, TimeUnit.MINUTES
         )
             .setInputData(inputData)
             .setConstraints(constraints)

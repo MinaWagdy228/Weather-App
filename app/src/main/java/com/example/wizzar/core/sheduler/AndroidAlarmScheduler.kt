@@ -33,8 +33,7 @@ class AndroidAlarmScheduler @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // 1. Calculate the actual End Time for "Today" to validate the Snooze
-        // We need this to ensure a 10-minute snooze doesn't push us past the allowed window (e.g., 5:00 PM)
+        // Calculate the actual End Time for "Today" to validate the Snooze
         val todayEndTimeInMillis = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, (alert.endTime / 60).toInt())
             set(Calendar.MINUTE, (alert.endTime % 60).toInt())
@@ -42,8 +41,7 @@ class AndroidAlarmScheduler @Inject constructor(
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
 
-        // 2. Determine if the snooze acts as a valid trigger
-        // It must be: Not Null AND In the Future AND Before the End Time
+        //  Determine if the snooze acts as a valid trigger
         val isValidSnooze = alert.snoozedUntil != null &&
                 alert.snoozedUntil > System.currentTimeMillis() &&
                 alert.snoozedUntil < todayEndTimeInMillis
@@ -51,7 +49,7 @@ class AndroidAlarmScheduler @Inject constructor(
         val triggerTimeInMillis: Long = if (isValidSnooze) {
             alert.snoozedUntil
         } else {
-            // Fallback: If snooze is invalid (e.g. past end time), we schedule for the standard start time.
+            // If snooze is invalid (e.g. past end time), we schedule for the standard start time.
             val calendar = Calendar.getInstance().apply {
                 val currentHour = get(Calendar.HOUR_OF_DAY)
                 val currentMinute = get(Calendar.MINUTE)
@@ -62,8 +60,6 @@ class AndroidAlarmScheduler @Inject constructor(
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
 
-                // If start time has passed for today (which is true if we just rejected a snooze because it was too late),
-                // schedule for tomorrow.
                 if (alert.startTime <= currentTotalMinutes) {
                     add(Calendar.DAY_OF_YEAR, 1)
                 }

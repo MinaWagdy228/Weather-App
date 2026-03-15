@@ -7,6 +7,7 @@ import com.example.wizzar.domain.usecase.GetLocationUseCase
 import com.example.wizzar.domain.usecase.GetWeatherUseCase
 import com.example.wizzar.domain.usecase.ManageAlertsUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase
+import com.example.wizzar.domain.usecase.SearchLocationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,9 @@ import javax.inject.Inject
 import kotlin.math.round
 
 import com.example.wizzar.R
+import com.example.wizzar.data.dataSource.local.datastore.AppLanguage
 import com.example.wizzar.data.dataSource.local.datastore.LocationMode
+import java.util.Locale
 
 sealed class AlertMessage {
     data class StringValue(val value: String) : AlertMessage()
@@ -33,7 +36,8 @@ class AlertsViewModel @Inject constructor(
     private val manageAlertsUseCase: ManageAlertsUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val getWeatherUseCase: GetWeatherUseCase,
-    private val manageSettingsUseCase: ManageSettingsUseCase
+    private val manageSettingsUseCase: ManageSettingsUseCase,
+    private val searchLocationsUseCase: SearchLocationsUseCase // Add this
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AlertsUiState())
@@ -91,8 +95,15 @@ class AlertsViewModel @Inject constructor(
             val finalLat = round(targetLat * 1000) / 1000.0
             val finalLon = round(targetLon * 1000) / 1000.0
 
-            val cachedWeather = getWeatherUseCase.getCachedWeather(finalLat, finalLon)
-            val cityName = cachedWeather?.currentWeather?.city ?: "Selected Location"
+            val currentLanguage = when (settings.language) {
+                AppLanguage.ARABIC -> "ar"
+                AppLanguage.ENGLISH -> "en"
+                AppLanguage.DEFAULT -> if (Locale.getDefault().language == "ar") "ar" else "en"
+            }
+
+            val cityName = searchLocationsUseCase.getCityName(finalLat, finalLon, currentLanguage)
+                ?: getWeatherUseCase.getCachedWeather(finalLat, finalLon)?.currentWeather?.city
+                ?: "Selected Location"
 
             val startTimeInMinutes = (startHour * 60L) + startMinute
             val endTimeInMinutes = (endHour * 60L) + endMinute

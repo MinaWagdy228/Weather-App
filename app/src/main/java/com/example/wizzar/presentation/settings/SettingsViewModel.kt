@@ -9,6 +9,8 @@ import com.example.wizzar.data.dataSource.local.datastore.LocationMode
 import com.example.wizzar.data.dataSource.local.datastore.TempUnit
 import com.example.wizzar.data.dataSource.local.datastore.UserSettings
 import com.example.wizzar.data.dataSource.local.datastore.WindUnit
+import com.example.wizzar.domain.usecase.ManageAlertsUseCase
+import com.example.wizzar.domain.usecase.ManageFavoritesUseCase
 import com.example.wizzar.domain.usecase.ManageSettingsUseCase // <-- INJECTING THE USE CASE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val manageSettingsUseCase: ManageSettingsUseCase
+    private val manageSettingsUseCase: ManageSettingsUseCase,
+    private val manageFavoritesUseCase: ManageFavoritesUseCase,
+    private val manageAlertsUseCase: ManageAlertsUseCase
 ) : ViewModel() {
 
     val settingsState: StateFlow<UserSettings> = manageSettingsUseCase.observeSettings()
@@ -44,6 +48,12 @@ class SettingsViewModel @Inject constructor(
     fun updateLanguage(language: AppLanguage) {
         viewModelScope.launch {
             manageSettingsUseCase.updateLanguage(language)
+            val languageCode = if (language == AppLanguage.ARABIC) "ar" else "en"
+
+            // Trigger background refresh of names
+            manageFavoritesUseCase.refreshFavoriteCityNames(languageCode)
+            manageAlertsUseCase.refreshAlertCityNames(languageCode)
+
             // Tell Android to physically switch the app's resource locale
             val locales = when (language) {
                 AppLanguage.ARABIC -> LocaleListCompat.forLanguageTags("ar")
